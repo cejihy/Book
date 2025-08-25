@@ -387,10 +387,20 @@
                 display: none !important;
             }
             
+            /* 确保头部正确显示 */
+            .header {
+                height: 50px !important;
+                min-height: 50px !important;
+                padding: 10px 15px !important;
+                padding-top: calc(10px + env(safe-area-inset-top)) !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+            }
+            
             /* 确保内容区域完全可见 */
             .reader-container {
-                height: 100vh !important;
-                height: 100dvh !important;
+                height: calc(100vh - 50px) !important;
+                height: calc(100dvh - 50px) !important;
                 overflow: hidden !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -645,7 +655,7 @@
             <button id="bookshelfBtn" class="btn">书架</button>
             <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
             <button id="prevBtn" class="btn">‹ 上一页</button>
-            <span id="pageNumber" class="page-number">3</span>
+            <span id="pageNumber" class="page-number">4</span>
             <button id="nextBtn" class="btn">下一页 ›</button>
             <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
         </div>
