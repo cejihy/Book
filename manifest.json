@@ -1,0 +1,28 @@
+{
+  "name": "EPUB 阅读器",
+  "short_name": "EPUB阅读器",
+  "description": "一个简洁的EPUB电子书阅读器",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2c3e50",
+  "theme_color": "#2c3e50",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect x='12' y='18' width='168' height='144' rx='12' fill='%232c3e50' stroke='%2334495e' stroke-width='2'/><rect x='18' y='24' width='156' height='132' fill='%23ecf0f1'/><line x1='24' y1='36' x2='108' y2='36' stroke='%23bdc3c7' stroke-width='2'/><line x1='24' y1='45' x2='108' y2='45' stroke='%23bdc3c7' stroke-width='2'/><line x1='24' y1='54' x2='96' y2='54' stroke='%23bdc3c7' stroke-width='2'/><rect x='132' y='12' width='6' height='48' fill='%23e74c3c'/><polygon points='132,12 138,12 135,18' fill='%23c0392b'/><circle cx='150' cy='24' r='2' fill='%233498db'/><circle cx='150' cy='33' r='2' fill='%233498db'/><circle cx='150' cy='42' r='2' fill='%233498db'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect x='32' y='48' width='448' height='384' rx='32' fill='%232c3e50' stroke='%2334495e' stroke-width='4'/><rect x='48' y='64' width='416' height='352' fill='%23ecf0f1'/><line x1='64' y1='96' x2='288' y2='96' stroke='%23bdc3c7' stroke-width='4'/><line x1='64' y1='120' x2='288' y2='120' stroke='%23bdc3c7' stroke-width='4'/><line x1='64' y1='144' x2='256' y2='144' stroke='%23bdc3c7' stroke-width='4'/><rect x='352' y='32' width='16' height='128' fill='%23e74c3c'/><polygon points='352,32 368,32 360,48' fill='%23c0392b'/><circle cx='400' cy='64' r='6' fill='%233498db'/><circle cx='400' cy='88' r='6' fill='%233498db'/><circle cx='400' cy='112' r='6' fill='%233498db'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["books", "education", "productivity"],
+  "lang": "zh-CN",
+  "dir": "ltr"
+}
