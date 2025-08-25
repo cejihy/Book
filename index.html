@@ -380,6 +380,64 @@
             gap: 15px;
             max-width: 90%;
         }
+        
+        /* PWA模式下隐藏安装提示 */
+        @media (display-mode: standalone) {
+            .install-prompt {
+                display: none !important;
+            }
+            
+            /* 确保内容区域完全可见 */
+            .reader-container {
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .viewer {
+                height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* 确保没有其他元素挡住内容 */
+            .overlay {
+                display: none !important;
+            }
+            
+            /* 确保body和html没有额外的padding */
+            html, body {
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+            }
+            
+            /* 确保主容器填满整个屏幕 */
+            .main-content {
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* 确保所有fixed元素不会挡住内容 */
+            [style*="position: fixed"] {
+                z-index: 9999 !important;
+            }
+            
+            /* 特别处理可能挡住底部的元素 */
+            .install-prompt,
+            .overlay,
+            #updateNotification {
+                display: none !important;
+            }
+        }
 
         .install-prompt button {
             background: #3498db;
