@@ -402,7 +402,8 @@
                         width: '100%',
                         height: '100%',
                         flow: 'paginated',
-                        manager: 'default'
+                        allowScriptedContent: true,
+                        allowPopups: true
                     });
                     
                     // 绑定渲染器事件
@@ -410,10 +411,13 @@
                         this.currentCfi = location.start.cfi;
                         this.updateNavigation();
                     });
-                    
-                    // 处理EPUB内容中的链接
+
+                    // 处理iframe的sandbox问题
                     this.rendition.on('rendered', (section) => {
-                        this.handleEpubLinks(section);
+                        const iframe = this.viewer.querySelector('iframe');
+                        if (iframe) {
+                            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
+                        }
                     });
                     
 
@@ -516,58 +520,6 @@
                     } catch (error) {
                         console.error('目录导航失败:', error);
                     }
-                }
-            }
-            
-            handleEpubLinks(section) {
-                // 获取epubjs渲染的文档
-                const doc = section.document;
-                if (!doc) return;
-                
-                // 处理所有链接
-                const links = doc.querySelectorAll('a[href]');
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    
-                    // 检查是否是内部链接
-                    if (href && (href.includes('.html') || href.includes('.xhtml') || href.startsWith('#'))) {
-                        // 移除原始href
-                        link.removeAttribute('href');
-                        
-                        // 添加点击事件
-                        link.addEventListener('click', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            this.handleEpubLink(href);
-                            return false;
-                        });
-                        
-                        // 移动设备触摸事件
-                        link.addEventListener('touchstart', (event) => {
-                            event.preventDefault();
-                        }, { passive: false });
-                        
-                        link.addEventListener('touchend', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            this.handleEpubLink(href);
-                            return false;
-                        }, { passive: false });
-                        
-                        // 保持链接样式
-                        link.style.cursor = 'pointer';
-                        link.style.textDecoration = 'underline';
-                        link.style.color = '#0066cc';
-                    }
-                });
-            }
-            
-            async handleEpubLink(href) {
-                try {
-                    // 使用epubjs的导航方法
-                    await this.rendition.display(href);
-                } catch (error) {
-                    console.error('EPUB链接导航失败:', error);
                 }
             }
 
