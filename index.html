@@ -181,6 +181,7 @@
             left: -300px;
             width: 300px;
             height: 100vh;
+            height: 100dvh;
             background: white;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             transition: left 0.3s;
@@ -195,10 +196,12 @@
         .toc-header {
             background: #2c3e50;
             color: white;
-            padding: 15px;
+            padding: 10px 15px;
+            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
+            min-height: 50px;
         }
 
         .toc-close {
@@ -363,7 +366,7 @@
 
     <div id="overlay" class="overlay"></div>
     
-    <div id="pageNumber" class="page-number">8</div>
+    <div id="pageNumber" class="page-number">9</div>
     
     <div id="installPrompt" class="install-prompt">
         <span>安装应用以获得更好的体验</span>
