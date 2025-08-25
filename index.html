@@ -305,6 +305,24 @@
             cursor: pointer;
             font-size: 16px;
         }
+        
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 10001;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
 
         .welcome {
             text-align: center;
@@ -372,6 +390,8 @@
         <div class="debug-content" id="debugContent"></div>
     </div>
     
+    <div id="successToast" class="success-toast">导航成功！</div>
+    
     <div id="tocPanel" class="toc-panel">
         <div class="toc-header">
             <h3>目录</h3>
@@ -416,6 +436,7 @@
                 this.debugPanel = document.getElementById('debugPanel');
                 this.debugContent = document.getElementById('debugContent');
                 this.debugClose = document.getElementById('debugClose');
+                this.successToast = document.getElementById('successToast');
             }
 
             bindEvents() {
@@ -526,18 +547,6 @@
                         li.addEventListener('click', (event) => {
                             event.preventDefault();
                             event.stopPropagation();
-                            event.stopImmediatePropagation();
-                            
-                            // 在移动设备上，使用setTimeout来避免立即执行
-                            setTimeout(() => {
-                                this.navigateToToc(item.href);
-                            }, 10);
-                        });
-                        
-                        // 添加触摸事件支持
-                        li.addEventListener('touchend', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
                             this.navigateToToc(item.href);
                         });
                         this.tocList.appendChild(li);
@@ -593,6 +602,8 @@
                             debugInfo += '方法1成功\n';
                             this.updateDebug(debugInfo);
                             this.closeToc();
+                            this.closeDebug();
+                            this.showSuccess();
                             return;
                         } catch (error) {
                             debugInfo += `方法1失败: ${error.message}\n`;
@@ -693,6 +704,13 @@
             closeDebug() {
                 this.debugPanel.classList.remove('show');
                 this.overlay.classList.remove('show');
+            }
+            
+            showSuccess() {
+                this.successToast.style.display = 'block';
+                setTimeout(() => {
+                    this.successToast.style.display = 'none';
+                }, 2000);
             }
         }
 
