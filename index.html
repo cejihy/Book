@@ -292,6 +292,7 @@
             <button id="prevBtn" class="btn" disabled>上一页</button>
             <button id="nextBtn" class="btn" disabled>下一页</button>
             <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+            <button id="testBtn" class="btn" disabled style="background: #e67e22;">测试</button>
         </div>
 
     </div>
@@ -356,6 +357,7 @@
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
                 this.tocBtn = document.getElementById('tocBtn');
+                this.testBtn = document.getElementById('testBtn');
                 
                 // 目录
                 this.tocPanel = document.getElementById('tocPanel');
@@ -369,6 +371,7 @@
                 this.prevBtn.addEventListener('click', () => this.prevPage());
                 this.nextBtn.addEventListener('click', () => this.nextPage());
                 this.tocBtn.addEventListener('click', () => this.toggleToc());
+                this.testBtn.addEventListener('click', () => this.testNavigation());
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
             }
@@ -454,6 +457,7 @@
                 this.prevBtn.disabled = !hasBook;
                 this.nextBtn.disabled = !hasBook;
                 this.tocBtn.disabled = !hasBook;
+                this.testBtn.disabled = !hasBook;
             }
 
             renderToc() {
@@ -513,22 +517,39 @@
             async navigateToToc(href) {
                 if (this.rendition) {
                     try {
-                        console.log('尝试导航到:', href);
+                        console.log('=== 目录导航调试信息 ===');
+                        console.log('目标href:', href);
+                        console.log('当前设备:', navigator.userAgent);
+                        console.log('是否移动设备:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+                        
+                        // 检查书籍状态
+                        console.log('书籍状态:', {
+                            hasBook: !!this.book,
+                            hasRendition: !!this.rendition,
+                            spineLength: this.book ? this.book.spine.length : 0
+                        });
                         
                         // 方法1: 直接使用href
                         try {
+                            console.log('尝试方法1: 直接使用href');
                             await this.rendition.display(href);
+                            console.log('方法1成功');
                             this.closeToc();
                             return;
                         } catch (error) {
-                            console.log('直接导航失败，尝试备用方案');
+                            console.log('方法1失败:', error.message);
                         }
                         
                         // 方法2: 通过spine索引导航
+                        console.log('尝试方法2: 通过spine索引导航');
                         const spine = this.book.spine;
+                        console.log('Spine项目数量:', spine.length);
+                        
                         for (let i = 0; i < spine.length; i++) {
                             const item = spine.get(i);
                             const itemHref = item.href;
+                            
+                            console.log(`Spine[${i}]:`, itemHref);
                             
                             // 检查href是否匹配
                             if (itemHref === href || 
@@ -538,26 +559,38 @@
                                 href.includes(itemHref.split('/').pop())) {
                                 
                                 console.log('找到匹配的spine项:', i, itemHref);
-                                await this.rendition.display(i);
-                                this.closeToc();
-                                return;
+                                try {
+                                    await this.rendition.display(i);
+                                    console.log('方法2成功');
+                                    this.closeToc();
+                                    return;
+                                } catch (error) {
+                                    console.log('方法2执行失败:', error.message);
+                                }
                             }
                         }
+                        console.log('方法2: 未找到匹配的spine项');
                         
                         // 方法3: 尝试使用CFI
+                        console.log('尝试方法3: 使用CFI导航');
                         try {
                             const locations = await this.book.locations.generate();
                             const cfi = this.book.cfiFromHref(href);
+                            console.log('生成的CFI:', cfi);
                             if (cfi) {
                                 await this.rendition.display(cfi);
+                                console.log('方法3成功');
                                 this.closeToc();
                                 return;
+                            } else {
+                                console.log('CFI生成失败');
                             }
                         } catch (cfiError) {
-                            console.log('CFI导航失败');
+                            console.log('CFI导航失败:', cfiError.message);
                         }
                         
-                        console.error('所有导航方法都失败了');
+                        console.error('=== 所有导航方法都失败了 ===');
+                        console.log('请检查以上调试信息，找出问题所在');
                         
                     } catch (error) {
                         console.error('目录导航失败:', error);
@@ -573,6 +606,17 @@
             closeToc() {
                 this.tocPanel.classList.remove('open');
                 this.overlay.classList.remove('show');
+            }
+            
+            testNavigation() {
+                console.log('=== 开始测试导航功能 ===');
+                if (this.toc && this.toc.toc && this.toc.toc.length > 0) {
+                    const firstItem = this.toc.toc[0];
+                    console.log('测试第一个目录项:', firstItem);
+                    this.navigateToToc(firstItem.href);
+                } else {
+                    console.log('没有可测试的目录项');
+                }
             }
         }
 
