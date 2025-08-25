@@ -469,6 +469,18 @@
                         li.addEventListener('click', (event) => {
                             event.preventDefault();
                             event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            
+                            // 在移动设备上，使用setTimeout来避免立即执行
+                            setTimeout(() => {
+                                this.navigateToToc(item.href);
+                            }, 10);
+                        });
+                        
+                        // 添加触摸事件支持
+                        li.addEventListener('touchend', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
                             this.navigateToToc(item.href);
                         });
                         this.tocList.appendChild(li);
@@ -501,29 +513,54 @@
             async navigateToToc(href) {
                 if (this.rendition) {
                     try {
-                        // 阻止默认的链接行为
-                        event.preventDefault();
+                        console.log('尝试导航到:', href);
                         
-                        // 使用epubjs的display方法进行内部导航
-                        await this.rendition.display(href);
-                        this.closeToc();
+                        // 方法1: 直接使用href
+                        try {
+                            await this.rendition.display(href);
+                            this.closeToc();
+                            return;
+                        } catch (error) {
+                            console.log('直接导航失败，尝试备用方案');
+                        }
+                        
+                        // 方法2: 通过spine索引导航
+                        const spine = this.book.spine;
+                        for (let i = 0; i < spine.length; i++) {
+                            const item = spine.get(i);
+                            const itemHref = item.href;
+                            
+                            // 检查href是否匹配
+                            if (itemHref === href || 
+                                itemHref.endsWith(href) || 
+                                href.endsWith(itemHref) ||
+                                itemHref.includes(href.split('/').pop()) ||
+                                href.includes(itemHref.split('/').pop())) {
+                                
+                                console.log('找到匹配的spine项:', i, itemHref);
+                                await this.rendition.display(i);
+                                this.closeToc();
+                                return;
+                            }
+                        }
+                        
+                        // 方法3: 尝试使用CFI
+                        try {
+                            const locations = await this.book.locations.generate();
+                            const cfi = this.book.cfiFromHref(href);
+                            if (cfi) {
+                                await this.rendition.display(cfi);
+                                this.closeToc();
+                                return;
+                            }
+                        } catch (cfiError) {
+                            console.log('CFI导航失败');
+                        }
+                        
+                        console.error('所有导航方法都失败了');
+                        
                     } catch (error) {
                         console.error('目录导航失败:', error);
-                        // 如果直接导航失败，尝试其他方式
-                        try {
-                            // 尝试使用CFI导航
-                            const spine = this.book.spine;
-                            for (let i = 0; i < spine.length; i++) {
-                                const item = spine.get(i);
-                                if (item.href === href || item.href.includes(href.split('/').pop())) {
-                                    await this.rendition.display(i);
-                                    this.closeToc();
-                                    return;
-                                }
-                            }
-                        } catch (fallbackError) {
-                            console.error('备用导航也失败:', fallbackError);
-                        }
                     }
                 }
             }
