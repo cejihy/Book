@@ -1,9 +1,11 @@
-const CACHE_NAME = 'epub-reader-v2';
+const CACHE_NAME = 'epub-reader-v3';
 const urlsToCache = [
   './',
   './index.html',
   './epub.min.js',
-  './jszip.min.js'
+  './jszip.min.js',
+  './icon.svg',
+  './manifest.json'
 ];
 
 // 安装Service Worker
@@ -70,8 +72,8 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: '您有新的阅读进度',
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="20" rx="2" fill="%232c3e50"/><rect x="6" y="8" width="20" height="16" fill="%23ecf0f1"/></svg>',
-    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="20" rx="2" fill="%233498db"/></svg>',
+    icon: './icon.svg',
+    badge: './icon.svg',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),

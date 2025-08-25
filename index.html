@@ -16,24 +16,63 @@
     <meta name="apple-mobile-web-app-title" content="EPUB阅读器">
     
     <!-- 标准图标 -->
-    <link rel="icon" href="icon.svg">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="icon" href="icon.svg" sizes="any" type="image/svg+xml">
+    <link rel="shortcut icon" href="icon.svg" type="image/svg+xml">
+    
+    <!-- 备用图标（Base64编码的简单图标） -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMmMzZTUwIiByeD0iNCIvPgo8cmVjdCB4PSI0IiB5PSI2IiB3aWR0aD0iMjQiIGhlaWdodD0iMjAiIGZpbGw9IiNlY2YwZjEiIHJ4PSIyIi8+CjxsaW5lIHgxPSI2IiB5MT0iMTAiIHgyPSIyMiIgeTI9IjEwIiBzdHJva2U9IiNiZGMzYzciIHN0cm9rZS13aWR0aD0iMSIvPgo8bGluZSB4MT0iNiIgeTE9IjEzIiB4Mj0iMjAiIHkyPSIxMyIgc3Ryb2tlPSIjYmRjM2M3IiBzdHJva2Utd2lkdGg9IjEiLz4KPGxpbmUgeDE9IjYiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iI2JkYzNjNyIgc3Ryb2tlLXdpZHRoPSIxIi8+CjxyZWN0IHg9IjI0IiB5PSI0IiB3aWR0aD0iNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI2U3NGMzYyIgcng9IjIiLz4KPC9zdmc+" type="image/svg+xml">
     
     <!-- iOS Safari 图标 -->
     <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="144x144" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="120x120" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="114x114" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="76x76" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="72x72" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="60x60" href="icon.svg">
+    <link rel="apple-touch-icon" sizes="57x57" href="icon.svg">
     
     <!-- Android Chrome 图标 -->
     <link rel="icon" type="image/svg+xml" sizes="192x192" href="icon.svg">
+    <link rel="icon" type="image/svg+xml" sizes="512x512" href="icon.svg">
+    <link rel="icon" type="image/svg+xml" sizes="96x96" href="icon.svg">
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="icon.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="icon.svg">
     
     <!-- 主题色 -->
     <meta name="theme-color" content="#2c3e50">
     <meta name="msapplication-TileColor" content="#2c3e50">
+    <meta name="msapplication-TileImage" content="icon.svg">
+    
+    <!-- PWA 额外配置 -->
+    <meta name="application-name" content="EPUB阅读器">
+    <meta name="apple-mobile-web-app-title" content="EPUB阅读器">
+    <meta name="msapplication-config" content="none">
     <script src="jszip.min.js"></script>
     <script src="epub.min.js"></script>
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -45,6 +84,11 @@
             flex-direction: column;
             margin: 0;
             padding: 0;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
         }
 
         .header {
@@ -72,6 +116,20 @@
             gap: 10px;
             align-items: center;
         }
+        
+        .page-indicator {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: auto;
+        }
 
         .btn {
             background: #34495e;
@@ -98,6 +156,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .loading {
@@ -105,6 +164,7 @@
             text-align: center;
             padding: 50px;
             color: #7f8c8d;
+            overflow: hidden;
         }
 
         .spinner {
@@ -126,6 +186,7 @@
             flex: 1;
             display: none;
             flex-direction: column;
+            overflow: hidden;
         }
 
 
@@ -137,6 +198,7 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
+            overflow: hidden;
         }
 
         #viewer {
@@ -170,6 +232,7 @@
             transition: left 0.3s;
             z-index: 1000;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .toc-panel.open {
@@ -239,6 +302,7 @@
             text-align: center;
             padding: 50px 20px;
             color: #7f8c8d;
+            overflow: hidden;
         }
 
         .welcome h2 {
@@ -251,23 +315,7 @@
             line-height: 1.6;
         }
 
-        .page-number {
-            position: fixed;
-            top: calc(60px + env(safe-area-inset-top));
-            right: calc(20px + env(safe-area-inset-right));
-            background: #3498db;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 1001;
-        }
+
 
         .install-prompt {
             position: fixed;
@@ -318,6 +366,7 @@
             transition: left 0.25s ease;
             z-index: 1000;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .bookshelf-panel.open {
@@ -493,6 +542,7 @@
             <button id="prevBtn" class="btn" disabled>上一页</button>
             <button id="nextBtn" class="btn" disabled>下一页</button>
             <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+            <div class="page-indicator">1</div>
         </div>
 
     </div>
@@ -520,10 +570,6 @@
     </div>
 
     <div id="overlay" class="overlay"></div>
-    
-    <div id="pageNumber" class="page-number">12</div>
-    
-
     
     <div id="installPrompt" class="install-prompt">
         <span>安装应用以获得更好的体验</span>
@@ -575,6 +621,10 @@
                     this.loadBookshelf().then(() => {
                         this.updateWelcomePage(); // 更新欢迎页面
                         this.restoreLastReadBook(); // 恢复上次阅读的书籍
+                        
+                        // 为书架和目录面板启用滚动
+                        this.allowScrollForElement(this.bookshelfList);
+                        this.allowScrollForElement(this.tocList);
                     });
                 });
             }
@@ -648,6 +698,63 @@
                 
                 // 禁用双击缩放
                 document.addEventListener('dblclick', (e) => e.preventDefault());
+                
+                // 禁用页面滚动和移动
+                this.disablePageScroll();
+            }
+            
+            disablePageScroll() {
+                // 禁用页面滚动
+                document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden';
+                
+                // 禁用页面拖拽
+                document.addEventListener('dragstart', (e) => e.preventDefault());
+                document.addEventListener('drop', (e) => e.preventDefault());
+                
+                // 禁用页面选择
+                document.addEventListener('selectstart', (e) => e.preventDefault());
+                document.addEventListener('contextmenu', (e) => e.preventDefault());
+                
+                // 禁用页面滚动
+                document.addEventListener('wheel', (e) => {
+                    // 允许在书架和目录面板中滚动
+                    if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                        return;
+                    }
+                    e.preventDefault();
+                }, { passive: false });
+                
+                // 禁用触摸滚动
+                document.addEventListener('touchmove', (e) => {
+                    // 允许在书架和目录面板中滚动
+                    if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                        return;
+                    }
+                    e.preventDefault();
+                }, { passive: false });
+                
+                // 禁用键盘滚动
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Home' || e.key === 'End') {
+                        if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                            return;
+                        }
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            // 允许特定元素滚动的方法
+            allowScrollForElement(element) {
+                if (element) {
+                    element.addEventListener('wheel', (e) => {
+                        e.stopPropagation();
+                    });
+                    element.addEventListener('touchmove', (e) => {
+                        e.stopPropagation();
+                    });
+                }
             }
 
             async loadBook(file) {
@@ -1106,7 +1213,7 @@
                         
                         this.saveBookshelf();
                         this.renderBookshelf();
-                    } catch (error) {
+                } catch (error) {
                         console.error('删除失败:', error);
                         alert('删除失败，请重试');
                     }
@@ -1469,6 +1576,41 @@
             closeInstall.addEventListener('click', () => {
                 installPrompt.style.display = 'none';
             });
+
+            // PWA 图标测试功能
+            if ('serviceWorker' in navigator) {
+                // 添加一个隐藏的测试按钮
+                const testButton = document.createElement('button');
+                testButton.textContent = '测试PWA图标';
+                testButton.style.cssText = `
+                    position: fixed;
+                    bottom: 10px;
+                    left: 10px;
+                    background: #3498db;
+                    color: white;
+                    border: none;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    z-index: 1000;
+                    opacity: 0.7;
+                `;
+                testButton.onclick = () => {
+                    if ('serviceWorker' in navigator && 'PushManager' in window) {
+                        navigator.serviceWorker.ready.then(registration => {
+                            registration.showNotification('PWA图标测试', {
+                                body: '如果您看到这个通知，说明PWA图标配置正确',
+                                icon: './icon.svg',
+                                badge: './icon.svg',
+                                vibrate: [200, 100, 200]
+                            });
+                        });
+                    } else {
+                        alert('PWA功能不可用');
+                    }
+                };
+                document.body.appendChild(testButton);
+            }
         });
     </script>
 </body>
