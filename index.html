@@ -487,6 +487,11 @@
                         this.updateNavigation();
                     });
                     
+                    // 处理EPUB内容中的内部链接
+                    this.rendition.on('rendered', (section) => {
+                        this.handleInternalLinks(section);
+                    });
+                    
                     // 显示阅读器
                     this.showReader();
                     
@@ -731,6 +736,66 @@
                     this.successToast.style.display = 'none';
                 }, 2000);
             }
+            
+            handleInternalLinks(section) {
+                // 获取当前渲染的文档
+                const doc = section.document;
+                if (!doc) return;
+                
+                // 处理所有内部链接
+                const links = doc.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    
+                    // 检查是否是内部链接
+                    if (href && (href.startsWith('#') || href.includes('.html') || href.includes('.xhtml'))) {
+                        // 阻止默认行为
+                        link.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            
+                            // 处理不同类型的内部链接
+                            this.handleInternalLink(href);
+                            return false;
+                        });
+                        
+                        // 移动设备触摸事件
+                        link.addEventListener('touchstart', (event) => {
+                            event.preventDefault();
+                        }, { passive: false });
+                        
+                        link.addEventListener('touchend', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            this.handleInternalLink(href);
+                            return false;
+                        }, { passive: false });
+                        
+                        // 添加视觉提示
+                        link.style.cursor = 'pointer';
+                        link.style.textDecoration = 'underline';
+                    }
+                });
+            }
+            
+            async handleInternalLink(href) {
+                try {
+                    console.log('处理内部链接:', href);
+                    
+                    if (href.startsWith('#')) {
+                        // 锚点链接，在当前页面内跳转
+                        await this.rendition.display(href);
+                    } else {
+                        // 其他内部链接，使用epubjs导航
+                        await this.rendition.display(href);
+                    }
+                    
+                    this.showSuccess();
+                } catch (error) {
+                    console.error('内部链接导航失败:', error);
+                }
+            }
         }
 
         // 初始化阅读器
@@ -740,7 +805,8 @@
             // 全局阻止所有可能的链接跳转
             document.addEventListener('click', (event) => {
                 const target = event.target;
-                if (target.closest('.toc-item') || target.closest('#tocPanel')) {
+                if (target.closest('.toc-item') || target.closest('#tocPanel') || 
+                    (target.tagName === 'A' && target.closest('#viewer'))) {
                     event.preventDefault();
                     event.stopPropagation();
                     event.stopImmediatePropagation();
@@ -751,7 +817,8 @@
             // 阻止触摸事件导致的页面跳转
             document.addEventListener('touchstart', (event) => {
                 const target = event.target;
-                if (target.closest('.toc-item') || target.closest('#tocPanel')) {
+                if (target.closest('.toc-item') || target.closest('#tocPanel') || 
+                    (target.tagName === 'A' && target.closest('#viewer'))) {
                     event.preventDefault();
                 }
             }, { passive: false });
