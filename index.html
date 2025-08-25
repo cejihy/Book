@@ -905,17 +905,17 @@
                 // 禁用双击缩放
                 document.addEventListener('dblclick', (e) => e.preventDefault());
                 
-                // 禁用页面滚动和移动
-                this.disablePageScroll();
+                // 允许页面滚动
+                // this.disablePageScroll();
                 
                 // 添加翻页栏触摸手势
                 this.bindPageControlsEvents();
             }
             
             disablePageScroll() {
-                // 禁用页面滚动
-                document.body.style.overflow = 'hidden';
-                document.documentElement.style.overflow = 'hidden';
+                // 允许页面滚动，只禁用一些不必要的功能
+                // document.body.style.overflow = 'hidden';
+                // document.documentElement.style.overflow = 'hidden';
                 
                 // 禁用页面拖拽
                 document.addEventListener('dragstart', (e) => e.preventDefault());
@@ -925,33 +925,31 @@
                 document.addEventListener('selectstart', (e) => e.preventDefault());
                 document.addEventListener('contextmenu', (e) => e.preventDefault());
                 
-                // 禁用页面滚动
-                document.addEventListener('wheel', (e) => {
-                    // 允许在书架和目录面板中滚动
-                    if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                        return;
-                    }
-                    e.preventDefault();
-                }, { passive: false });
+                // 允许页面滚动，不阻止wheel事件
+                // document.addEventListener('wheel', (e) => {
+                //     if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                //         return;
+                //     }
+                //     e.preventDefault();
+                // }, { passive: false });
                 
-                // 禁用触摸滚动
-                document.addEventListener('touchmove', (e) => {
-                    // 允许在书架和目录面板中滚动
-                    if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                        return;
-                    }
-                    e.preventDefault();
-                }, { passive: false });
+                // 允许触摸滚动，不阻止touchmove事件
+                // document.addEventListener('touchmove', (e) => {
+                //     if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                //         return;
+                //     }
+                //     e.preventDefault();
+                // }, { passive: false });
                 
-                // 禁用键盘滚动
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Home' || e.key === 'End') {
-                        if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                            return;
-                        }
-                        e.preventDefault();
-                    }
-                });
+                // 允许键盘滚动，不阻止方向键
+                // document.addEventListener('keydown', (e) => {
+                //     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Home' || e.key === 'End') {
+                //         if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
+                //             return;
+                //         }
+                //         e.preventDefault();
+                //     }
+                // });
             }
             
             // 允许特定元素滚动的方法
