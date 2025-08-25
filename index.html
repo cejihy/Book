@@ -463,7 +463,15 @@
                         li.className = 'toc-item';
                         li.style.paddingLeft = `${15 + level * 20}px`;
                         li.textContent = item.label;
-                        li.addEventListener('click', () => this.navigateToToc(item.href));
+                        
+                        // 添加调试信息
+                        console.log('目录项:', item.label, '链接:', item.href);
+                        
+                        li.addEventListener('click', () => {
+                            console.log('点击目录项:', item.label, 'href:', item.href);
+                            this.navigateToToc(item.href);
+                        });
+                        
                         this.tocList.appendChild(li);
                         
                         // 如果有子目录，递归渲染
@@ -493,8 +501,60 @@
 
             async navigateToToc(href) {
                 if (this.rendition) {
-                    await this.rendition.display(href);
-                    this.closeToc();
+                    try {
+                        console.log('导航到目录项:', href);
+                        
+                        // 尝试多种导航方式
+                        let success = false;
+                        
+                        // 方式1: 直接使用href
+                        try {
+                            await this.rendition.display(href);
+                            success = true;
+                        } catch (error) {
+                            console.log('方式1失败:', error);
+                        }
+                        
+                        // 方式2: 如果href包含#，尝试去掉#后的部分
+                        if (!success && href.includes('#')) {
+                            try {
+                                const baseHref = href.split('#')[0];
+                                await this.rendition.display(baseHref);
+                                success = true;
+                            } catch (error) {
+                                console.log('方式2失败:', error);
+                            }
+                        }
+                        
+                        // 方式3: 尝试使用CFI导航
+                        if (!success) {
+                            try {
+                                // 获取书籍的spine，尝试找到对应的章节
+                                const spine = this.book.spine;
+                                for (let i = 0; i < spine.length; i++) {
+                                    const item = spine.get(i);
+                                    if (item.href === href || item.href.includes(href.split('/').pop())) {
+                                        await this.rendition.display(i);
+                                        success = true;
+                                        break;
+                                    }
+                                }
+                            } catch (error) {
+                                console.log('方式3失败:', error);
+                            }
+                        }
+                        
+                        if (success) {
+                            this.closeToc();
+                        } else {
+                            console.error('所有导航方式都失败了');
+                            alert('无法跳转到该章节，请手动翻页');
+                        }
+                        
+                    } catch (error) {
+                        console.error('目录导航失败:', error);
+                        alert('目录跳转失败，请手动翻页');
+                    }
                 }
             }
 
