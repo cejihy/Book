@@ -243,6 +243,17 @@
             -ms-user-select: none;
             pointer-events: auto;
         }
+        
+        /* 确保EPUB内容中的链接不会被当作真正的链接 */
+        #viewer a {
+            pointer-events: auto !important;
+            text-decoration: underline !important;
+            color: #0066cc !important;
+        }
+        
+        #viewer a[data-href] {
+            cursor: pointer !important;
+        }
 
         .toc-item:hover {
             background: #f8f9fa;
@@ -749,6 +760,10 @@
                     
                     // 检查是否是内部链接
                     if (href && (href.startsWith('#') || href.includes('.html') || href.includes('.xhtml'))) {
+                        // 移除href属性，防止浏览器处理
+                        link.removeAttribute('href');
+                        link.setAttribute('data-href', href);
+                        
                         // 阻止默认行为
                         link.addEventListener('click', (event) => {
                             event.preventDefault();
@@ -775,6 +790,7 @@
                         // 添加视觉提示
                         link.style.cursor = 'pointer';
                         link.style.textDecoration = 'underline';
+                        link.style.color = '#0066cc';
                     }
                 });
             }
@@ -813,6 +829,25 @@
                     return false;
                 }
             }, true);
+            
+            // 拦截所有可能的导航
+            window.addEventListener('beforeunload', (event) => {
+                // 如果是通过内部链接触发的导航，阻止它
+                if (event.target !== window) {
+                    event.preventDefault();
+                    event.returnValue = '';
+                    return '';
+                }
+            });
+            
+            // 拦截历史记录变化
+            window.addEventListener('popstate', (event) => {
+                // 阻止通过内部链接导致的历史记录变化
+                if (event.state && event.state.source === 'internal') {
+                    event.preventDefault();
+                    return false;
+                }
+            });
             
             // 阻止触摸事件导致的页面跳转
             document.addEventListener('touchstart', (event) => {
