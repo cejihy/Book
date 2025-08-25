@@ -1786,26 +1786,88 @@
                         .then((registration) => {
                             console.log('SW registered: ', registration);
                             
-                            // 强制更新 Service Worker
-                            registration.update();
+                            // 检查更新
+                            function checkForUpdates() {
+                                registration.update().then(() => {
+                                    console.log('检查更新完成');
+                                }).catch(err => {
+                                    console.log('检查更新失败:', err);
+                                });
+                            }
+                            
+                            // 页面加载时检查更新
+                            checkForUpdates();
+                            
+                            // 每小时检查一次更新
+                            setInterval(checkForUpdates, 60 * 60 * 1000);
                             
                             // 监听 Service Worker 更新
                             registration.addEventListener('updatefound', () => {
+                                console.log('发现Service Worker更新');
                                 const newWorker = registration.installing;
+                                
                                 newWorker.addEventListener('statechange', () => {
                                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // 提示用户刷新页面以应用更新
-                                        if (confirm('发现新版本，是否刷新页面？')) {
-                                            window.location.reload();
-                                        }
+                                        console.log('新版本已安装，等待激活');
+                                        
+                                        // 显示更新提示
+                                        showUpdateNotification();
                                     }
                                 });
+                            });
+                            
+                            // 监听Service Worker激活
+                            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                                console.log('Service Worker已激活，页面将刷新');
+                                window.location.reload();
                             });
                         })
                         .catch((registrationError) => {
                             console.log('SW registration failed: ', registrationError);
                         });
                 });
+            }
+            
+            // 显示更新提示
+            function showUpdateNotification() {
+                // 创建更新提示元素
+                const updateNotification = document.createElement('div');
+                updateNotification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #3498db;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    font-size: 14px;
+                    max-width: 300px;
+                `;
+                updateNotification.innerHTML = `
+                    <div style="margin-bottom: 10px;">发现新版本</div>
+                    <button id="updateBtn" style="background: white; color: #3498db; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">立即更新</button>
+                    <button id="updateLater" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 4px; cursor: pointer;">稍后</button>
+                `;
+                
+                document.body.appendChild(updateNotification);
+                
+                // 绑定事件
+                document.getElementById('updateBtn').addEventListener('click', () => {
+                    window.location.reload();
+                });
+                
+                document.getElementById('updateLater').addEventListener('click', () => {
+                    updateNotification.remove();
+                });
+                
+                // 5秒后自动消失
+                setTimeout(() => {
+                    if (updateNotification.parentNode) {
+                        updateNotification.remove();
+                    }
+                }, 5000);
             }
 
             // PWA 安装提示
