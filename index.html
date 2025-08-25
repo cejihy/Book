@@ -820,23 +820,17 @@
             
             // 手动更新方法
             manualUpdate() {
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    // 显示更新状态
-                    this.manualUpdateBtn.textContent = '🔄 检查中...';
-                    this.manualUpdateBtn.disabled = true;
+                // 显示更新状态
+                this.manualUpdateBtn.textContent = '🔄 检查中...';
+                this.manualUpdateBtn.disabled = true;
+                
+                // 使用全局更新检查函数
+                if (window.checkForUpdates) {
+                    window.checkForUpdates();
                     
-                    // 检查更新
-                    navigator.serviceWorker.controller.postMessage({type: 'CHECK_UPDATE'});
-                    
-                    // 监听更新结果
-                    navigator.serviceWorker.addEventListener('message', (event) => {
-                        if (event.data.type === 'UPDATE_AVAILABLE') {
-                            this.manualUpdateBtn.textContent = '🔄 有更新';
-                            this.manualUpdateBtn.style.background = '#e74c3c';
-                            this.manualUpdateBtn.onclick = () => {
-                                window.location.reload();
-                            };
-                        } else if (event.data.type === 'NO_UPDATE') {
+                    // 3秒后检查是否有更新
+                    setTimeout(() => {
+                        if (this.manualUpdateBtn.textContent === '🔄 检查中...') {
                             this.manualUpdateBtn.textContent = '✅ 已最新';
                             this.manualUpdateBtn.style.background = '#27ae60';
                             setTimeout(() => {
@@ -845,18 +839,13 @@
                                 this.manualUpdateBtn.disabled = false;
                             }, 2000);
                         }
-                    });
-                    
-                    // 5秒后恢复按钮状态
-                    setTimeout(() => {
-                        if (this.manualUpdateBtn.textContent === '🔄 检查中...') {
-                            this.manualUpdateBtn.textContent = '🔄 更新';
-                            this.manualUpdateBtn.disabled = false;
-                        }
-                    }, 5000);
+                    }, 3000);
                 } else {
-                    // 如果没有Service Worker，直接刷新页面
-                    window.location.reload();
+                    // 如果没有全局函数，直接刷新页面
+                    this.manualUpdateBtn.textContent = '🔄 刷新中...';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 }
             }
 
@@ -1720,8 +1709,11 @@
                             // 页面加载时立即检查更新
                             checkForUpdates();
                             
-                            // 每5分钟检查一次更新
-                            setInterval(checkForUpdates, 5 * 60 * 1000);
+                            // 每2分钟检查一次更新
+                            setInterval(checkForUpdates, 2 * 60 * 1000);
+                            
+                            // 添加全局更新检查函数
+                            window.checkForUpdates = checkForUpdates;
                             
                             // 监听 Service Worker 更新
                             registration.addEventListener('updatefound', () => {
