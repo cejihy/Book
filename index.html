@@ -387,6 +387,7 @@
                     
                     // 获取目录
                     this.toc = await this.book.loaded.navigation;
+                    console.log('目录数据:', this.toc);
                     this.renderToc();
                     
                     // 创建渲染器
@@ -455,13 +456,39 @@
             renderToc() {
                 this.tocList.innerHTML = '';
                 
-                this.toc.toc.forEach(item => {
+                // 递归渲染目录项
+                const renderTocItems = (items, level = 0) => {
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'toc-item';
+                        li.style.paddingLeft = `${15 + level * 20}px`;
+                        li.textContent = item.label;
+                        li.addEventListener('click', () => this.navigateToToc(item.href));
+                        this.tocList.appendChild(li);
+                        
+                        // 如果有子目录，递归渲染
+                        if (item.subitems && item.subitems.length > 0) {
+                            renderTocItems(item.subitems, level + 1);
+                        }
+                    });
+                };
+                
+                // 渲染主目录
+                if (this.toc.toc && this.toc.toc.length > 0) {
+                    renderTocItems(this.toc.toc);
+                } else if (this.toc && this.toc.length > 0) {
+                    // 备用方案：直接使用toc数组
+                    renderTocItems(this.toc);
+                }
+                
+                // 如果没有目录，显示提示
+                if (this.tocList.children.length === 0) {
                     const li = document.createElement('li');
                     li.className = 'toc-item';
-                    li.textContent = item.label;
-                    li.addEventListener('click', () => this.navigateToToc(item.href));
+                    li.textContent = '暂无目录信息';
+                    li.style.color = '#999';
                     this.tocList.appendChild(li);
-                });
+                }
             }
 
             async navigateToToc(href) {
