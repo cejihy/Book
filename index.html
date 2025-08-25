@@ -159,26 +159,12 @@
             flex: 1;
             background: white;
             position: relative;
-            touch-action: none;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         #viewer {
             width: 100%;
             height: 100%;
             border: none;
-            touch-action: none;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .navigation {
@@ -369,7 +355,7 @@
 
     <div id="overlay" class="overlay"></div>
     
-    <div id="pageNumber" class="page-number">2</div>
+    <div id="pageNumber" class="page-number">3</div>
     
     <div id="tocPanel" class="toc-panel">
         <div class="toc-header">
@@ -421,34 +407,7 @@
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
                 
-                // 防止双击放大 - 移动端优化
-                this.viewer.addEventListener('dblclick', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                });
 
-                // 移动端触摸事件处理
-                let lastTouchTime = 0;
-                const doubleTapDelay = 300;
-
-                this.viewer.addEventListener('touchstart', (e) => {
-                    const currentTime = new Date().getTime();
-                    const timeDiff = currentTime - lastTouchTime;
-                    
-                    if (timeDiff < doubleTapDelay && timeDiff > 0) {
-                        // 检测到双击，阻止默认行为
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                    }
-                    lastTouchTime = currentTime;
-                }, { passive: false });
-
-                this.viewer.addEventListener('touchend', (e) => {
-                    // 阻止触摸结束时的默认行为
-                    e.preventDefault();
-                }, { passive: false });
             }
 
             async loadBook(file) {
@@ -490,33 +449,6 @@
                         const iframe = this.viewer.querySelector('iframe');
                         if (iframe) {
                             iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
-                            
-                            // 防止双击放大 - 在iframe内容加载后应用样式
-                            iframe.addEventListener('load', () => {
-                                try {
-                                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                                    if (iframeDoc) {
-                                        // 添加CSS样式到iframe内容
-                                        const style = iframeDoc.createElement('style');
-                                        style.textContent = `
-                                            * {
-                                                touch-action: manipulation !important;
-                                                -webkit-touch-callout: none !important;
-                                                -webkit-user-select: none !important;
-                                                -moz-user-select: none !important;
-                                                -ms-user-select: none !important;
-                                                user-select: none !important;
-                                            }
-                                            body {
-                                                touch-action: manipulation !important;
-                                            }
-                                        `;
-                                        iframeDoc.head.appendChild(style);
-                                    }
-                                } catch (e) {
-                                    // 跨域限制，忽略错误
-                                }
-                            });
                         }
                     });
                     
