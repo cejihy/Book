@@ -595,7 +595,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
             
-
+            // 全局拦截EPUB内容中的链接点击
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target.tagName === 'A' && target.closest('#viewer')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            }, true);
+            
+            // 移动设备专用：拦截触摸事件
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                document.addEventListener('touchstart', (event) => {
+                    const target = event.target;
+                    if (target.tagName === 'A' && target.closest('#viewer')) {
+                        event.preventDefault();
+                    }
+                }, { passive: false });
+            }
         });
     </script>
 </body>
