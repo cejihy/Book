@@ -1,4 +1,4 @@
-const CACHE_NAME = 'epub-reader-v6';
+const CACHE_NAME = 'epub-reader-v7';
 const urlsToCache = [
   './',
   './index.html',
@@ -30,39 +30,41 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // 立即控制所有客户端
+      return self.clients.claim();
     })
   );
 });
 
 // 拦截网络请求
 self.addEventListener('fetch', (event) => {
+  // 跳过非GET请求
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        // 如果缓存中有响应，返回缓存的响应
-        if (response) {
+        // 检查是否获得有效响应
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
-        
-        // 否则从网络获取
-        return fetch(event.request).then(
-          (response) => {
-            // 检查是否获得有效响应
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
 
-            // 克隆响应
-            const responseToCache = response.clone();
+        // 克隆响应
+        const responseToCache = response.clone();
 
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+        caches.open(CACHE_NAME)
+          .then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
 
-            return response;
-          }
-        );
+        return response;
+      })
+      .catch(() => {
+        // 网络失败时从缓存获取
+        return caches.match(event.request);
       })
   );
 });

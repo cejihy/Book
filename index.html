@@ -1793,11 +1793,11 @@
                                 });
                             }
                             
-                            // 页面加载时检查更新
+                            // 页面加载时立即检查更新
                             checkForUpdates();
                             
-                            // 每小时检查一次更新
-                            setInterval(checkForUpdates, 60 * 60 * 1000);
+                            // 每5分钟检查一次更新
+                            setInterval(checkForUpdates, 5 * 60 * 1000);
                             
                             // 监听 Service Worker 更新
                             registration.addEventListener('updatefound', () => {
@@ -1817,7 +1817,16 @@
                             // 监听Service Worker激活
                             navigator.serviceWorker.addEventListener('controllerchange', () => {
                                 console.log('Service Worker已激活，页面将刷新');
-                                window.location.reload();
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                            });
+                            
+                            // 监听页面可见性变化，当页面重新可见时检查更新
+                            document.addEventListener('visibilitychange', () => {
+                                if (!document.hidden) {
+                                    checkForUpdates();
+                                }
                             });
                         })
                         .catch((registrationError) => {
@@ -1828,44 +1837,63 @@
             
             // 显示更新提示
             function showUpdateNotification() {
+                // 移除已存在的更新提示
+                const existingNotification = document.getElementById('updateNotification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
                 // 创建更新提示元素
                 const updateNotification = document.createElement('div');
+                updateNotification.id = 'updateNotification';
                 updateNotification.style.cssText = `
                     position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #3498db;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: #2c3e50;
                     color: white;
-                    padding: 15px 20px;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    padding: 20px;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
                     z-index: 10000;
-                    font-size: 14px;
-                    max-width: 300px;
+                    font-size: 16px;
+                    text-align: center;
+                    min-width: 280px;
+                    border: 2px solid #3498db;
                 `;
                 updateNotification.innerHTML = `
-                    <div style="margin-bottom: 10px;">发现新版本</div>
-                    <button id="updateBtn" style="background: white; color: #3498db; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">立即更新</button>
-                    <button id="updateLater" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 4px; cursor: pointer;">稍后</button>
+                    <div style="margin-bottom: 15px; font-weight: bold; color: #3498db;">🔄 发现新版本</div>
+                    <div style="margin-bottom: 20px; font-size: 14px;">应用已更新，点击下方按钮应用新版本</div>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="updateBtn" style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">立即更新</button>
+                        <button id="updateLater" style="background: transparent; color: white; border: 1px solid #95a5a6; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;">稍后</button>
+                    </div>
                 `;
                 
                 document.body.appendChild(updateNotification);
                 
                 // 绑定事件
                 document.getElementById('updateBtn').addEventListener('click', () => {
-                    window.location.reload();
+                    updateNotification.innerHTML = '<div style="text-align: center;">🔄 正在更新...</div>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 });
                 
                 document.getElementById('updateLater').addEventListener('click', () => {
                     updateNotification.remove();
                 });
                 
-                // 5秒后自动消失
+                // 10秒后自动更新
                 setTimeout(() => {
                     if (updateNotification.parentNode) {
-                        updateNotification.remove();
+                        updateNotification.innerHTML = '<div style="text-align: center;">🔄 自动更新中...</div>';
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     }
-                }, 5000);
+                }, 10000);
             }
 
             // PWA 安装提示
