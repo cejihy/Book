@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EPUB 阅读器</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <script src="jszip.min.js"></script>
+    <script src="epub.js"></script>
     <style>
         * {
             margin: 0;
@@ -376,7 +376,6 @@
                 this.tocBtn.addEventListener('click', () => this.toggleToc());
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
-                this.debugClose.addEventListener('click', () => this.closeDebug());
             }
 
             async loadBook(file) {
