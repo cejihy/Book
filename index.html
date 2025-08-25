@@ -10,10 +10,8 @@
     
     <!-- PWA 支持 -->
     <link rel="manifest" href="manifest.json">
-
     
     <!-- 主题色 -->
-    <meta name="theme-color" content="#2c3e50">
     <meta name="theme-color" content="#2c3e50">
     <script src="jszip.min.js"></script>
     <script src="epub.min.js"></script>
@@ -69,30 +67,6 @@
             align-items: center;
         }
         
-        .page-indicator {
-            background: #3498db;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            margin-left: auto;
-        }
-        
-
-        
-
-        
-
-        
-
-        
-
-        
         .page-number {
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -112,14 +86,6 @@
             flex-direction: column;
             height: 100%;
         }
-        
-
-        
-
-        
-
-        
-
         
         /* 确保内容区域正确显示 */
         .viewer iframe {
@@ -201,6 +167,7 @@
             position: relative;
             user-select: none;
             min-height: 0;
+            cursor: pointer; /* 添加指针样式 */
         }
 
         #viewer {
@@ -208,6 +175,38 @@
             height: 100%;
             border: none;
             user-select: none;
+        }
+
+        /* 添加翻页提示样式 */
+        .page-hint {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .page-hint.show {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .page-hint.left {
+            left: 30px;
+        }
+
+        .page-hint.right {
+            right: 30px;
         }
 
 
@@ -267,8 +266,6 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        
-
 
         .toc-item:hover {
             background: #f8f9fa;
@@ -558,6 +555,19 @@
             <p style="margin-top: 20px; font-size: 14px; color: #3498db;">
                 💡 在书架中添加书籍，点击即可阅读
             </p>
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                <h3 style="margin-bottom: 15px; color: #2c3e50; font-size: 16px;">📖 阅读操作说明</h3>
+                <div style="font-size: 13px; line-height: 1.6; color: #555;">
+                    <p><strong>鼠标操作：</strong></p>
+                    <p>• 点击阅读区域左侧 ← 上一页</p>
+                    <p>• 点击阅读区域右侧 → 下一页</p>
+                    <p><strong>键盘操作：</strong></p>
+                    <p>• 左箭头键 / A键 ← 上一页</p>
+                    <p>• 右箭头键 / D键 → 下一页</p>
+                    <p>• Home键 → 跳转到开头</p>
+                    <p>• End键 → 跳转到结尾</p>
+                </div>
+            </div>
         </div>
 
 
@@ -565,6 +575,8 @@
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
                 <div id="viewer"></div>
+                <div id="pageHintLeft" class="page-hint left">‹ 上一页</div>
+                <div id="pageHintRight" class="page-hint right">下一页 ›</div>
             </div>
             
 
@@ -660,6 +672,10 @@
                 this.bookshelfClose = document.getElementById('bookshelfClose');
                 this.bookCount = document.getElementById('bookCount');
                 
+                // 翻页提示元素
+                this.pageHintLeft = document.getElementById('pageHintLeft');
+                this.pageHintRight = document.getElementById('pageHintRight');
+                
                 // 手动更新按钮事件
                 this.manualUpdateBtn.addEventListener('click', () => {
                     this.manualUpdate();
@@ -695,53 +711,19 @@
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.bookshelfBtn.addEventListener('click', () => this.toggleBookshelf());
                 this.bookshelfClose.addEventListener('click', () => this.closeBookshelf());
-                this.overlay.addEventListener('click', () => {
-                    this.closeToc();
-                    this.closeBookshelf();
-                });
+                this.overlay.addEventListener('click', () => this.closeAllPanels());
                 
-
+                // 添加点击翻页功能
+                this.viewer.addEventListener('click', (e) => this.handleViewerClick(e));
                 
-
+                // 添加键盘翻页支持
+                document.addEventListener('keydown', (e) => this.handleKeyDown(e));
                 
-                // 允许页面滚动
-                // this.disablePageScroll();
-                
-
+                // 页面滚动已启用
             }
             
-            disablePageScroll() {
-                // 允许页面滚动，只禁用一些不必要的功能
-                // document.body.style.overflow = 'hidden';
-                // document.documentElement.style.overflow = 'hidden';
-                
-
-                
-                // 允许页面滚动，不阻止wheel事件
-                // document.addEventListener('wheel', (e) => {
-                //     if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                //         return;
-                //     }
-                //     e.preventDefault();
-                // }, { passive: false });
-                
-                // 允许触摸滚动，不阻止touchmove事件
-                // document.addEventListener('touchmove', (e) => {
-                //     if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                //         return;
-                //     }
-                //     e.preventDefault();
-                // }, { passive: false });
-                
-                // 允许键盘滚动，不阻止方向键
-                // document.addEventListener('keydown', (e) => {
-                //     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Home' || e.key === 'End') {
-                //         if (e.target.closest('.bookshelf-panel') || e.target.closest('.toc-panel')) {
-                //             return;
-                //         }
-                //         e.preventDefault();
-                //     }
-                // });
+                        disablePageScroll() {
+                // 页面滚动已启用，无需额外处理
             }
             
 
@@ -883,6 +865,7 @@
                 this.hideLoading();
                 this.readerContainer.style.display = 'flex';
                 this.updateNavigation();
+                this.showReadingTips();
             }
 
             async prevPage() {
@@ -897,15 +880,153 @@
                 }
             }
 
+            // 处理阅读器点击事件
+            handleViewerClick(e) {
+                if (!this.rendition) return;
+                
+                const rect = this.viewer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = rect.width;
+                
+                // 左侧1/3区域点击翻到上一页
+                if (x < width / 3) {
+                    this.showPageHint('left');
+                    this.prevPage();
+                }
+                // 右侧1/3区域点击翻到下一页
+                else if (x > width * 2 / 3) {
+                    this.showPageHint('right');
+                    this.nextPage();
+                }
+                // 中间区域不执行任何操作
+            }
+
+            // 显示翻页提示
+            showPageHint(direction) {
+                const hintElement = direction === 'left' ? 
+                    document.getElementById('pageHintLeft') : 
+                    document.getElementById('pageHintRight');
+                
+                if (hintElement) {
+                    hintElement.classList.add('show');
+                    setTimeout(() => {
+                        hintElement.classList.remove('show');
+                    }, 500);
+                }
+            }
+
+            // 处理键盘事件
+            handleKeyDown(e) {
+                if (!this.rendition) return;
+                
+                // 防止在输入框中触发翻页
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                
+                switch (e.key) {
+                    case 'ArrowLeft':
+                    case 'a':
+                    case 'A':
+                        e.preventDefault();
+                        this.showPageHint('left');
+                        this.prevPage();
+                        break;
+                    case 'ArrowRight':
+                    case 'd':
+                    case 'D':
+                        e.preventDefault();
+                        this.showPageHint('right');
+                        this.nextPage();
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        this.goToBeginning();
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        this.goToEnd();
+                        break;
+                }
+            }
+
+            // 跳转到开头
+            async goToBeginning() {
+                if (this.rendition) {
+                    try {
+                        await this.rendition.display('epubcfi(/6/2[chapter-1]!/4/2/1:0)');
+                    } catch (error) {
+                        console.log('跳转到开头失败:', error);
+                    }
+                }
+            }
+
+            // 跳转到结尾
+            async goToEnd() {
+                if (this.rendition && this.book) {
+                    try {
+                        const spineItems = this.book.spine.items;
+                        const lastItem = spineItems[spineItems.length - 1];
+                        await this.rendition.display(lastItem.href);
+                    } catch (error) {
+                        console.log('跳转到结尾失败:', error);
+                    }
+                }
+            }
+
+            // 显示阅读提示
+            showReadingTips() {
+                const tip = document.createElement('div');
+                tip.id = 'readingTip';
+                tip.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.9);
+                    color: white;
+                    padding: 20px 30px;
+                    border-radius: 10px;
+                    font-size: 14px;
+                    z-index: 1000;
+                    text-align: center;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    backdrop-filter: blur(10px);
+                    animation: fadeInOut 3s ease-in-out forwards;
+                `;
+                
+                tip.innerHTML = `
+                    <div style="margin-bottom: 10px; font-size: 18px;">📖</div>
+                    <div style="margin-bottom: 8px; font-weight: 600;">点击翻页已启用</div>
+                    <div style="font-size: 12px; opacity: 0.8;">
+                        左侧点击 ← 上一页 | 右侧点击 → 下一页<br>
+                        或使用键盘：← → 箭头键
+                    </div>
+                `;
+                
+                // 添加动画样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fadeInOut {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                        20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(tip);
+                
+                // 3秒后自动移除
+                setTimeout(() => {
+                    if (tip.parentNode) {
+                        tip.parentNode.removeChild(tip);
+                    }
+                }, 3000);
+            }
 
 
-            showPageControls() {
-                // 翻页栏现在是固定显示的，不需要额外处理
-            }
-            
-            hidePageControls() {
-                // 翻页栏现在是固定显示的，不需要隐藏
-            }
+
+
             
             updatePageNumber(location) {
                 if (this.pageNumber && location) {
@@ -981,6 +1102,11 @@
             closeToc() {
                 this.tocPanel.classList.remove('open');
                 this.overlay.classList.remove('show');
+            }
+
+            closeAllPanels() {
+                this.closeToc();
+                this.closeBookshelf();
             }
 
             // 书架相关方法
