@@ -729,8 +729,8 @@
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
             <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+            <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
         </div>
-
     </div>
 
     <div class="main-content">
@@ -845,6 +845,7 @@
                 this.tocBtn = document.getElementById('tocBtn');
                 this.bookshelfBtn = document.getElementById('bookshelfBtn');
                 this.addBookBtn = document.getElementById('addBookBtn');
+                this.manualUpdateBtn = document.getElementById('manualUpdateBtn');
                 
                 // 翻页栏
                 this.pageControls = document.getElementById('pageControls');
@@ -861,6 +862,11 @@
                 this.bookshelfList = document.getElementById('bookshelfList');
                 this.bookshelfClose = document.getElementById('bookshelfClose');
                 this.bookCount = document.getElementById('bookCount');
+                
+                // 手动更新按钮事件
+                this.manualUpdateBtn.addEventListener('click', () => {
+                    this.manualUpdate();
+                });
 
             }
 
@@ -967,6 +973,48 @@
             // 绑定翻页栏事件
             bindPageControlsEvents() {
                 // 翻页栏现在是固定显示的，不需要触摸手势
+            }
+            
+            // 手动更新方法
+            manualUpdate() {
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    // 显示更新状态
+                    this.manualUpdateBtn.textContent = '🔄 检查中...';
+                    this.manualUpdateBtn.disabled = true;
+                    
+                    // 检查更新
+                    navigator.serviceWorker.controller.postMessage({type: 'CHECK_UPDATE'});
+                    
+                    // 监听更新结果
+                    navigator.serviceWorker.addEventListener('message', (event) => {
+                        if (event.data.type === 'UPDATE_AVAILABLE') {
+                            this.manualUpdateBtn.textContent = '🔄 有更新';
+                            this.manualUpdateBtn.style.background = '#e74c3c';
+                            this.manualUpdateBtn.onclick = () => {
+                                window.location.reload();
+                            };
+                        } else if (event.data.type === 'NO_UPDATE') {
+                            this.manualUpdateBtn.textContent = '✅ 已最新';
+                            this.manualUpdateBtn.style.background = '#27ae60';
+                            setTimeout(() => {
+                                this.manualUpdateBtn.textContent = '🔄 更新';
+                                this.manualUpdateBtn.style.background = '#27ae60';
+                                this.manualUpdateBtn.disabled = false;
+                            }, 2000);
+                        }
+                    });
+                    
+                    // 5秒后恢复按钮状态
+                    setTimeout(() => {
+                        if (this.manualUpdateBtn.textContent === '🔄 检查中...') {
+                            this.manualUpdateBtn.textContent = '🔄 更新';
+                            this.manualUpdateBtn.disabled = false;
+                        }
+                    }, 5000);
+                } else {
+                    // 如果没有Service Worker，直接刷新页面
+                    window.location.reload();
+                }
             }
 
             async loadBook(file) {
@@ -1760,15 +1808,48 @@
 
         }
 
-        // 检测网络状态
-        function updateOnlineStatus() {
-            if (!navigator.onLine) {
-                console.log('应用处于离线状态');
-                // 可以在这里添加离线提示
+                    // 检测网络状态
+            function updateOnlineStatus() {
+                if (!navigator.onLine) {
+                    console.log('应用处于离线状态');
+                    showOfflineIndicator();
                 } else {
-                console.log('应用已连接到网络');
+                    console.log('应用已连接到网络');
+                    hideOfflineIndicator();
+                }
             }
-        }
+            
+            // 显示离线指示器
+            function showOfflineIndicator() {
+                let indicator = document.getElementById('offlineIndicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'offlineIndicator';
+                    indicator.style.cssText = `
+                        position: fixed;
+                        top: 10px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: #e74c3c;
+                        color: white;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        z-index: 10001;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    `;
+                    indicator.textContent = '📶 离线模式';
+                    document.body.appendChild(indicator);
+                }
+            }
+            
+            // 隐藏离线指示器
+            function hideOfflineIndicator() {
+                const indicator = document.getElementById('offlineIndicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
         
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);

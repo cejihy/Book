@@ -4,7 +4,8 @@ const urlsToCache = [
   './index.html',
   './epub.min.js',
   './jszip.min.js',
-  './manifest.json'
+  './manifest.json',
+  './sw.js'
 ];
 
 // 安装Service Worker
@@ -91,4 +92,18 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.openWindow('./')
   );
+});
+
+// 处理来自页面的消息
+self.addEventListener('message', (event) => {
+  if (event.data.type === 'CHECK_UPDATE') {
+    // 检查是否有更新
+    self.registration.update().then(() => {
+      // 通知页面检查完成
+      event.ports[0].postMessage({type: 'UPDATE_CHECKED'});
+    }).catch(() => {
+      // 通知页面没有更新
+      event.ports[0].postMessage({type: 'NO_UPDATE'});
+    });
+  }
 });
