@@ -381,33 +381,63 @@
             max-width: 90%;
         }
         
-        /* PWA模式下隐藏安装提示 */
+        /* PWA模式优化 */
         @media (display-mode: standalone) {
+            /* 隐藏安装提示 */
             .install-prompt {
                 display: none !important;
             }
             
+            /* 重置body布局 */
+            body {
+                display: block !important;
+                flex-direction: unset !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
             /* 确保头部正确显示 */
             .header {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
                 height: 50px !important;
                 min-height: 50px !important;
                 padding: 10px 15px !important;
                 padding-top: calc(10px + env(safe-area-inset-top)) !important;
                 box-sizing: border-box !important;
                 margin: 0 !important;
+                z-index: 1000 !important;
             }
             
-            /* 确保内容区域完全可见 */
-            .reader-container {
-                height: calc(100vh - 50px) !important;
-                height: calc(100dvh - 50px) !important;
+            /* 确保主容器正确布局 */
+            .main-content {
+                position: fixed !important;
+                top: 50px !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
                 overflow: hidden !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
             
-            .viewer {
+            /* 确保内容区域完全可见 */
+            .reader-container {
                 height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            
+            .viewer {
+                flex: 1 !important;
                 overflow: hidden !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -418,33 +448,13 @@
                 display: none !important;
             }
             
-            /* 确保body和html没有额外的padding */
-            html, body {
+            /* 确保html没有额外的padding */
+            html {
                 padding: 0 !important;
                 margin: 0 !important;
                 overflow: hidden !important;
                 height: 100vh !important;
                 height: 100dvh !important;
-            }
-            
-            /* 确保主容器填满整个屏幕 */
-            .main-content {
-                height: 100vh !important;
-                height: 100dvh !important;
-                overflow: hidden !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            /* 确保所有fixed元素不会挡住内容 */
-            [style*="position: fixed"] {
-                z-index: 9999 !important;
-            }
-            
-            /* 特别处理可能挡住底部的元素 */
-            .install-prompt,
-            .overlay {
-                display: none !important;
             }
         }
 
