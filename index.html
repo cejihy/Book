@@ -238,6 +238,10 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: auto;
         }
 
         .toc-item:hover {
@@ -547,7 +551,22 @@
                         li.addEventListener('click', (event) => {
                             event.preventDefault();
                             event.stopPropagation();
+                            event.stopImmediatePropagation();
                             this.navigateToToc(item.href);
+                            return false;
+                        });
+                        
+                        // 移动设备专用的事件处理
+                        li.addEventListener('touchstart', (event) => {
+                            event.preventDefault();
+                        });
+                        
+                        li.addEventListener('touchend', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            this.navigateToToc(item.href);
+                            return false;
                         });
                         this.tocList.appendChild(li);
                         
@@ -717,6 +736,25 @@
         // 初始化阅读器
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
+            
+            // 全局阻止所有可能的链接跳转
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target.closest('.toc-item') || target.closest('#tocPanel')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    return false;
+                }
+            }, true);
+            
+            // 阻止触摸事件导致的页面跳转
+            document.addEventListener('touchstart', (event) => {
+                const target = event.target;
+                if (target.closest('.toc-item') || target.closest('#tocPanel')) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
         });
     </script>
 </body>
