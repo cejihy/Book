@@ -159,24 +159,26 @@
             flex: 1;
             background: white;
             position: relative;
-            touch-action: manipulation;
+            touch-action: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #viewer {
             width: 100%;
             height: 100%;
             border: none;
-            touch-action: manipulation;
+            touch-action: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .navigation {
@@ -419,12 +421,34 @@
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
                 
-                // 防止双击放大
+                // 防止双击放大 - 移动端优化
                 this.viewer.addEventListener('dblclick', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 });
+
+                // 移动端触摸事件处理
+                let lastTouchTime = 0;
+                const doubleTapDelay = 300;
+
+                this.viewer.addEventListener('touchstart', (e) => {
+                    const currentTime = new Date().getTime();
+                    const timeDiff = currentTime - lastTouchTime;
+                    
+                    if (timeDiff < doubleTapDelay && timeDiff > 0) {
+                        // 检测到双击，阻止默认行为
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                    lastTouchTime = currentTime;
+                }, { passive: false });
+
+                this.viewer.addEventListener('touchend', (e) => {
+                    // 阻止触摸结束时的默认行为
+                    e.preventDefault();
+                }, { passive: false });
             }
 
             async loadBook(file) {
