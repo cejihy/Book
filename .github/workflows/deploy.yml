@@ -25,10 +25,37 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 1
+
+    - name: Cache optimized files
+      uses: actions/cache@v3
+      with:
+        path: |
+          *.gz
+        key: ${{ runner.os }}-optimized-${{ hashFiles('*.html', '*.js', '*.json') }}
+        restore-keys: |
+          ${{ runner.os }}-optimized-
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
+
+    - name: Optimize files
+      run: |
+        # 检查缓存，如果没有缓存则压缩文件
+        if [ ! -f "index.html.gz" ]; then
+          echo "Compressing files..."
+          # 压缩HTML文件
+          gzip -9 -c index.html > index.html.gz
+          # 压缩JS文件
+          gzip -9 -c epub.min.js > epub.min.js.gz
+          gzip -9 -c jszip.min.js > jszip.min.js.gz
+          gzip -9 -c sw.js > sw.js.gz
+          # 压缩JSON文件
+          gzip -9 -c manifest.json > manifest.json.gz
+          echo "Files compressed successfully"
+        else
+          echo "Using cached compressed files"
+        fi
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
