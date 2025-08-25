@@ -107,6 +107,7 @@
         .page-controls {
             background: rgba(44, 62, 80, 0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 12px 20px;
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
             display: flex;
@@ -118,6 +119,8 @@
             box-sizing: border-box;
             flex-shrink: 0;
             width: 100%;
+            position: relative;
+            z-index: 1000;
         }
         
 
@@ -137,6 +140,9 @@
             transition: all 0.2s ease;
             min-width: 80px;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .page-btn:hover:not(:disabled) {
@@ -197,11 +203,13 @@
                 padding: 10px 16px;
                 padding-bottom: calc(10px + env(safe-area-inset-bottom));
                 height: 50px;
+                background: rgba(44, 62, 80, 0.98);
             }
             
             .page-btn {
                 padding: 8px 10px;
                 min-width: 50px;
+                border-radius: 6px;
             }
             
             .page-btn-text {
@@ -215,6 +223,34 @@
             .page-number {
                 padding: 6px 10px;
                 font-size: 12px;
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+        
+        /* PWA 和全屏模式优化 */
+        @media (display-mode: standalone) {
+            .page-controls {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom) + 10px);
+                background: rgba(44, 62, 80, 0.98);
+            }
+        }
+        
+        /* 横屏模式优化 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .page-controls {
+                height: 40px;
+                padding: 8px 16px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            }
+            
+            .page-btn {
+                padding: 6px 8px;
+                min-width: 40px;
+            }
+            
+            .page-number {
+                padding: 4px 8px;
+                font-size: 11px;
             }
         }
         
