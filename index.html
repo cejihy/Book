@@ -263,6 +263,48 @@
         .overlay.show {
             display: block;
         }
+        
+        .debug-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            z-index: 10000;
+            display: none;
+        }
+        
+        .debug-panel.show {
+            display: block;
+        }
+        
+        .debug-content {
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .debug-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
         .welcome {
             text-align: center;
@@ -325,6 +367,11 @@
 
     <div id="overlay" class="overlay"></div>
     
+    <div id="debugPanel" class="debug-panel">
+        <button class="debug-close" id="debugClose">&times;</button>
+        <div class="debug-content" id="debugContent"></div>
+    </div>
+    
     <div id="tocPanel" class="toc-panel">
         <div class="toc-header">
             <h3>目录</h3>
@@ -364,6 +411,11 @@
                 this.tocList = document.getElementById('tocList');
                 this.tocClose = document.getElementById('tocClose');
                 this.overlay = document.getElementById('overlay');
+                
+                // 调试面板
+                this.debugPanel = document.getElementById('debugPanel');
+                this.debugContent = document.getElementById('debugContent');
+                this.debugClose = document.getElementById('debugClose');
             }
 
             bindEvents() {
@@ -374,6 +426,7 @@
                 this.testBtn.addEventListener('click', () => this.testNavigation());
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
+                this.debugClose.addEventListener('click', () => this.closeDebug());
             }
 
             async loadBook(file) {
@@ -517,27 +570,33 @@
             async navigateToToc(href) {
                 if (this.rendition) {
                     try {
-                        console.log('=== 目录导航调试信息 ===');
-                        console.log('目标href:', href);
-                        console.log('当前设备:', navigator.userAgent);
-                        console.log('是否移动设备:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+                        let debugInfo = '=== 目录导航调试信息 ===\n';
+                        debugInfo += `目标href: ${href}\n`;
+                        debugInfo += `当前设备: ${navigator.userAgent}\n`;
+                        debugInfo += `是否移动设备: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}\n`;
                         
                         // 检查书籍状态
-                        console.log('书籍状态:', {
+                        const bookStatus = {
                             hasBook: !!this.book,
                             hasRendition: !!this.rendition,
                             spineLength: this.book ? this.book.spine.length : 0
-                        });
+                        };
+                        debugInfo += `书籍状态: ${JSON.stringify(bookStatus, null, 2)}\n`;
+                        
+                        this.showDebug(debugInfo);
                         
                         // 方法1: 直接使用href
                         try {
-                            console.log('尝试方法1: 直接使用href');
+                            debugInfo += '尝试方法1: 直接使用href\n';
+                            this.updateDebug(debugInfo);
                             await this.rendition.display(href);
-                            console.log('方法1成功');
+                            debugInfo += '方法1成功\n';
+                            this.updateDebug(debugInfo);
                             this.closeToc();
                             return;
                         } catch (error) {
-                            console.log('方法1失败:', error.message);
+                            debugInfo += `方法1失败: ${error.message}\n`;
+                            this.updateDebug(debugInfo);
                         }
                         
                         // 方法2: 通过spine索引导航
@@ -609,14 +668,31 @@
             }
             
             testNavigation() {
-                console.log('=== 开始测试导航功能 ===');
+                let debugInfo = '=== 开始测试导航功能 ===\n';
                 if (this.toc && this.toc.toc && this.toc.toc.length > 0) {
                     const firstItem = this.toc.toc[0];
-                    console.log('测试第一个目录项:', firstItem);
+                    debugInfo += `测试第一个目录项: ${JSON.stringify(firstItem, null, 2)}\n`;
+                    this.showDebug(debugInfo);
                     this.navigateToToc(firstItem.href);
                 } else {
-                    console.log('没有可测试的目录项');
+                    debugInfo += '没有可测试的目录项\n';
+                    this.showDebug(debugInfo);
                 }
+            }
+            
+            showDebug(info) {
+                this.debugContent.textContent = info;
+                this.debugPanel.classList.add('show');
+                this.overlay.classList.add('show');
+            }
+            
+            updateDebug(info) {
+                this.debugContent.textContent = info;
+            }
+            
+            closeDebug() {
+                this.debugPanel.classList.remove('show');
+                this.overlay.classList.remove('show');
             }
         }
 
