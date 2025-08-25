@@ -1531,6 +1531,19 @@
 
         }
 
+        // 检测网络状态
+        function updateOnlineStatus() {
+            if (!navigator.onLine) {
+                console.log('应用处于离线状态');
+                // 可以在这里添加离线提示
+            } else {
+                console.log('应用已连接到网络');
+            }
+        }
+        
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        
         // 初始化阅读器
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
@@ -1541,6 +1554,22 @@
                     navigator.serviceWorker.register('./sw.js')
                         .then((registration) => {
                             console.log('SW registered: ', registration);
+                            
+                            // 强制更新 Service Worker
+                            registration.update();
+                            
+                            // 监听 Service Worker 更新
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        // 提示用户刷新页面以应用更新
+                                        if (confirm('发现新版本，是否刷新页面？')) {
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                            });
                         })
                         .catch((registrationError) => {
                             console.log('SW registration failed: ', registrationError);
