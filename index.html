@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>EPUB 阅读器</title>
     
     <!-- PWA 支持 -->
@@ -40,21 +43,20 @@
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
+            margin: 0;
+            padding: 0;
         }
 
         .header {
             background: #2c3e50;
             color: white;
-            padding: 15px;
-            padding-top: calc(15px + env(safe-area-inset-top));
+            padding: 10px 15px;
+            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-height: 50px;
         }
 
 
@@ -265,7 +267,7 @@
 
         .page-number {
             position: fixed;
-            top: calc(80px + env(safe-area-inset-top));
+            top: calc(60px + env(safe-area-inset-top));
             right: calc(20px + env(safe-area-inset-right));
             background: #3498db;
             color: white;
@@ -361,7 +363,7 @@
 
     <div id="overlay" class="overlay"></div>
     
-    <div id="pageNumber" class="page-number">7</div>
+    <div id="pageNumber" class="page-number">8</div>
     
     <div id="installPrompt" class="install-prompt">
         <span>安装应用以获得更好的体验</span>
