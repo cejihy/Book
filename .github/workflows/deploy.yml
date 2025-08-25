@@ -16,48 +16,6 @@ jobs:
       with:
         fetch-depth: 0  # 获取完整历史用于缓存
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'  # 启用npm缓存
-
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.npm
-          node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: Install dependencies (if package.json exists)
-      if: hashFiles('package.json') != ''
-      run: npm ci --prefer-offline --no-audit
-
-    - name: Optimize files
-      run: |
-        # 压缩HTML文件
-        if command -v gzip &> /dev/null; then
-          echo "Compressing HTML file..."
-          gzip -9 -c index.html > index.html.gz
-        fi
-        
-        # 压缩JavaScript文件
-        if command -v gzip &> /dev/null; then
-          echo "Compressing JavaScript files..."
-          gzip -9 -c epub.min.js > epub.min.js.gz
-          gzip -9 -c jszip.min.js > jszip.min.js.gz
-          gzip -9 -c sw.js > sw.js.gz
-        fi
-        
-        # 压缩manifest文件
-        if command -v gzip &> /dev/null; then
-          echo "Compressing manifest file..."
-          gzip -9 -c manifest.json > manifest.json.gz
-        fi
-
     - name: Cache optimized files
       uses: actions/cache@v3
       with:
@@ -67,6 +25,37 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-optimized-
 
+    - name: Optimize files
+      run: |
+        echo "Starting file optimization..."
+        
+        # 压缩HTML文件
+        if command -v gzip &> /dev/null; then
+          echo "Compressing HTML file..."
+          gzip -9 -c index.html > index.html.gz
+          echo "HTML compression completed"
+        else
+          echo "gzip not available, skipping compression"
+        fi
+        
+        # 压缩JavaScript文件
+        if command -v gzip &> /dev/null; then
+          echo "Compressing JavaScript files..."
+          gzip -9 -c epub.min.js > epub.min.js.gz
+          gzip -9 -c jszip.min.js > jszip.min.js.gz
+          gzip -9 -c sw.js > sw.js.gz
+          echo "JavaScript compression completed"
+        fi
+        
+        # 压缩manifest文件
+        if command -v gzip &> /dev/null; then
+          echo "Compressing manifest file..."
+          gzip -9 -c manifest.json > manifest.json.gz
+          echo "Manifest compression completed"
+        fi
+        
+        echo "File optimization completed"
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -74,7 +63,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: .
         force_orphan: true  # 使用干净的分支，避免历史
-        cname:  # 如果有自定义域名，在这里添加
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
         commit_message: 'Deploy to GitHub Pages - ${{ github.sha }}'
