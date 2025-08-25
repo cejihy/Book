@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPUB 阅读器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .file-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-label:hover {
+            background: #2980b9;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2c3e50;
+        }
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .info {
+            color: #ecf0f1;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .reader-container {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+
+        .reader-header {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-bottom: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .book-title {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .progress {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .viewer {
+            flex: 1;
+            background: white;
+            position: relative;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .navigation {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-top: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .toc-btn {
+            background: #e74c3c;
+        }
+
+        .toc-btn:hover {
+            background: #c0392b;
+        }
+
+        .toc-panel {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .toc-panel.open {
+            left: 0;
+        }
+
+        .toc-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toc-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .toc-list {
+            padding: 0;
+            list-style: none;
+        }
+
+        .toc-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toc-item:hover {
+            background: #f8f9fa;
+        }
+
+        .toc-item.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 50px 20px;
+            color: #7f8c8d;
+        }
+
+        .welcome h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .welcome p {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EPUB 阅读器</h1>
+        <div class="file-input-container">
+            <input type="file" id="fileInput" class="file-input" accept=".epub">
+            <label for="fileInput" class="file-label">选择 EPUB 文件</label>
+        </div>
+        <div class="controls">
+            <button id="prevBtn" class="btn" disabled>上一页</button>
+            <button id="nextBtn" class="btn" disabled>下一页</button>
+            <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+        </div>
+
+    </div>
+
+    <div class="main-content">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载 EPUB 文件...</p>
+        </div>
+
+        <div id="welcome" class="welcome">
+            <h2>欢迎使用 EPUB 阅读器</h2>
+            <p>请点击上方的"选择 EPUB 文件"按钮来开始阅读</p>
+            <p>支持的功能：</p>
+            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <li>EPUB 文件阅读</li>
+                <li>页面导航</li>
+                <li>目录浏览</li>
+                <li>阅读进度显示</li>
+            </ul>
+        </div>
+
+        <div id="readerContainer" class="reader-container">
+            <div class="viewer">
+                <div id="viewer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+    
+    <div id="tocPanel" class="toc-panel">
+        <div class="toc-header">
+            <h3>目录</h3>
+            <button class="toc-close" id="tocClose">&times;</button>
+        </div>
+        <ul id="tocList" class="toc-list"></ul>
+    </div>
+
+    <script>
+        class EpubReader {
+            constructor() {
+                this.book = null;
+                this.rendition = null;
+                this.currentCfi = null;
+                this.toc = [];
+                
+                this.initElements();
+                this.bindEvents();
+            }
+
+            initElements() {
+                this.fileInput = document.getElementById('fileInput');
+                this.loading = document.getElementById('loading');
+                this.welcome = document.getElementById('welcome');
+                this.readerContainer = document.getElementById('readerContainer');
+                this.viewer = document.getElementById('viewer');
+
+                
+                // 按钮
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.tocBtn = document.getElementById('tocBtn');
+                
+                // 目录
+                this.tocPanel = document.getElementById('tocPanel');
+                this.tocList = document.getElementById('tocList');
+                this.tocClose = document.getElementById('tocClose');
+                this.overlay = document.getElementById('overlay');
+            }
+
+            bindEvents() {
+                this.fileInput.addEventListener('change', (e) => this.loadBook(e.target.files[0]));
+                this.prevBtn.addEventListener('click', () => this.prevPage());
+                this.nextBtn.addEventListener('click', () => this.nextPage());
+                this.tocBtn.addEventListener('click', () => this.toggleToc());
+                this.tocClose.addEventListener('click', () => this.closeToc());
+                this.overlay.addEventListener('click', () => this.closeToc());
+            }
+
+            async loadBook(file) {
+                if (!file) return;
+
+                this.showLoading();
+                
+                try {
+                    // 创建 EPUB 实例
+                    this.book = ePub(file);
+                    
+                    // 等待书籍加载完成
+                    await this.book.ready;
+                    
+                    // 获取书籍信息
+                    const metadata = await this.book.loaded.metadata;
+                    
+                    // 获取目录
+                    this.toc = await this.book.loaded.navigation;
+                    this.renderToc();
+                    
+                    // 创建渲染器
+                    this.rendition = this.book.renderTo(this.viewer, {
+                        width: '100%',
+                        height: '100%',
+                        flow: 'paginated'
+                    });
+                    
+                    // 绑定渲染器事件
+                    this.rendition.on('relocated', (location) => {
+                        this.currentCfi = location.start.cfi;
+                        this.updateNavigation();
+                    });
+                    
+                    // 显示阅读器
+                    this.showReader();
+                    
+                    // 开始渲染
+                    await this.rendition.display();
+                    
+                } catch (error) {
+                    console.error('加载书籍失败:', error);
+                    alert('加载书籍失败，请检查文件格式是否正确。');
+                    this.hideLoading();
+                }
+            }
+
+            showLoading() {
+                this.loading.style.display = 'block';
+                this.welcome.style.display = 'none';
+                this.readerContainer.style.display = 'none';
+            }
+
+            hideLoading() {
+                this.loading.style.display = 'none';
+            }
+
+            showReader() {
+                this.hideLoading();
+                this.readerContainer.style.display = 'flex';
+                this.updateNavigation();
+            }
+
+            async prevPage() {
+                if (this.rendition) {
+                    await this.rendition.prev();
+                }
+            }
+
+            async nextPage() {
+                if (this.rendition) {
+                    await this.rendition.next();
+                }
+            }
+
+
+
+            updateNavigation() {
+                const hasBook = !!this.book;
+                this.prevBtn.disabled = !hasBook;
+                this.nextBtn.disabled = !hasBook;
+                this.tocBtn.disabled = !hasBook;
+            }
+
+            renderToc() {
+                this.tocList.innerHTML = '';
+                
+                this.toc.toc.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'toc-item';
+                    li.textContent = item.label;
+                    li.addEventListener('click', () => this.navigateToToc(item.href));
+                    this.tocList.appendChild(li);
+                });
+            }
+
+            async navigateToToc(href) {
+                if (this.rendition) {
+                    await this.rendition.display(href);
+                    this.closeToc();
+                }
+            }
+
+            toggleToc() {
+                this.tocPanel.classList.add('open');
+                this.overlay.classList.add('show');
+            }
+
+            closeToc() {
+                this.tocPanel.classList.remove('open');
+                this.overlay.classList.remove('show');
+            }
+        }
+
+        // 初始化阅读器
+        document.addEventListener('DOMContentLoaded', () => {
+            new EpubReader();
+        });
+    </script>
+</body>
+</html>
