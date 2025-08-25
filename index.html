@@ -170,6 +170,49 @@
             cursor: pointer; /* 添加指针样式 */
         }
 
+        /* 添加透明的翻页覆盖层 */
+        .page-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .page-overlay.active {
+            pointer-events: auto;
+        }
+
+        .page-overlay .left-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 33.33%;
+            height: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .page-overlay .left-area:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .page-overlay .right-area {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 33.33%;
+            height: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .page-overlay .right-area:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
         #viewer {
             width: 100%;
             height: 100%;
@@ -577,6 +620,10 @@
                 <div id="viewer"></div>
                 <div id="pageHintLeft" class="page-hint left">‹ 上一页</div>
                 <div id="pageHintRight" class="page-hint right">下一页 ›</div>
+                <div id="pageOverlay" class="page-overlay">
+                    <div class="left-area" id="leftArea"></div>
+                    <div class="right-area" id="rightArea"></div>
+                </div>
             </div>
             
 
@@ -676,6 +723,11 @@
                 this.pageHintLeft = document.getElementById('pageHintLeft');
                 this.pageHintRight = document.getElementById('pageHintRight');
                 
+                // 翻页覆盖层元素
+                this.pageOverlay = document.getElementById('pageOverlay');
+                this.leftArea = document.getElementById('leftArea');
+                this.rightArea = document.getElementById('rightArea');
+                
                 // 手动更新按钮事件
                 this.manualUpdateBtn.addEventListener('click', () => {
                     this.manualUpdate();
@@ -712,9 +764,6 @@
                 this.bookshelfBtn.addEventListener('click', () => this.toggleBookshelf());
                 this.bookshelfClose.addEventListener('click', () => this.closeBookshelf());
                 this.overlay.addEventListener('click', () => this.closeAllPanels());
-                
-                // 添加点击翻页功能
-                this.viewer.addEventListener('click', (e) => this.handleViewerClick(e));
                 
                 // 添加键盘翻页支持
                 document.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -866,6 +915,9 @@
                 this.readerContainer.style.display = 'flex';
                 this.updateNavigation();
                 this.showReadingTips();
+                
+                // 激活翻页覆盖层
+                this.activatePageOverlay();
             }
 
             async prevPage() {
@@ -880,26 +932,7 @@
                 }
             }
 
-            // 处理阅读器点击事件
-            handleViewerClick(e) {
-                if (!this.rendition) return;
-                
-                const rect = this.viewer.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const width = rect.width;
-                
-                // 左侧1/3区域点击翻到上一页
-                if (x < width / 3) {
-                    this.showPageHint('left');
-                    this.prevPage();
-                }
-                // 右侧1/3区域点击翻到下一页
-                else if (x > width * 2 / 3) {
-                    this.showPageHint('right');
-                    this.nextPage();
-                }
-                // 中间区域不执行任何操作
-            }
+
 
             // 显示翻页提示
             showPageHint(direction) {
@@ -972,6 +1005,50 @@
                 }
             }
 
+            // 激活翻页覆盖层
+            activatePageOverlay() {
+                if (!this.pageOverlay || !this.leftArea || !this.rightArea) {
+                    console.error('翻页覆盖层元素未找到');
+                    return;
+                }
+                
+                // 移除之前的事件监听器
+                this.leftArea.removeEventListener('click', this.handleLeftClick.bind(this));
+                this.rightArea.removeEventListener('click', this.handleRightClick.bind(this));
+                
+                // 绑定新的事件监听器
+                this.leftArea.addEventListener('click', this.handleLeftClick.bind(this));
+                this.rightArea.addEventListener('click', this.handleRightClick.bind(this));
+                
+                // 激活覆盖层
+                this.pageOverlay.classList.add('active');
+                
+                console.log('翻页覆盖层已激活');
+                
+                // 添加测试提示
+                setTimeout(() => {
+                    console.log('翻页覆盖层测试：请点击阅读区域左右两侧测试翻页功能');
+                }, 1000);
+            }
+
+            // 处理左侧点击
+            handleLeftClick(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('左侧区域被点击');
+                this.showPageHint('left');
+                this.prevPage();
+            }
+
+            // 处理右侧点击
+            handleRightClick(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('右侧区域被点击');
+                this.showPageHint('right');
+                this.nextPage();
+            }
+
             // 显示阅读提示
             showReadingTips() {
                 const tip = document.createElement('div');
@@ -997,8 +1074,8 @@
                     <div style="margin-bottom: 10px; font-size: 18px;">📖</div>
                     <div style="margin-bottom: 8px; font-weight: 600;">点击翻页已启用</div>
                     <div style="font-size: 12px; opacity: 0.8;">
-                        左侧点击 ← 上一页 | 右侧点击 → 下一页<br>
-                        或使用键盘：← → 箭头键
+                        点击阅读区域左右两侧即可翻页<br>
+                        或使用键盘：← → 箭头键 / A D键
                     </div>
                 `;
                 
