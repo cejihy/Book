@@ -294,6 +294,33 @@
             }
         }
         
+        /* PWA模式优化 */
+        @media (display-mode: standalone) {
+            .page-controls {
+                height: 50px;
+                padding: 10px 16px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+                background: rgba(44, 62, 80, 0.98);
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                box-sizing: border-box;
+            }
+            
+            .reader-container {
+                padding-bottom: 50px;
+                height: 100vh;
+                height: 100dvh;
+            }
+            
+            .viewer {
+                height: calc(100vh - 50px);
+                height: calc(100dvh - 50px);
+            }
+        }
+        
         /* 确保内容区域正确显示 */
         .viewer iframe {
             width: 100% !important;
