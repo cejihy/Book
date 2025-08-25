@@ -1606,40 +1606,7 @@
                 installPrompt.style.display = 'none';
             });
 
-            // PWA 图标测试功能
-            if ('serviceWorker' in navigator) {
-                // 添加一个隐藏的测试按钮
-                const testButton = document.createElement('button');
-                testButton.textContent = '测试PWA图标';
-                testButton.style.cssText = `
-                    position: fixed;
-                    bottom: 10px;
-                    left: 10px;
-                    background: #3498db;
-                    color: white;
-                    border: none;
-                    padding: 8px 12px;
-                    border-radius: 4px;
-                    font-size: 12px;
-                    z-index: 1000;
-                    opacity: 0.7;
-                `;
-                testButton.onclick = () => {
-                    if ('serviceWorker' in navigator && 'PushManager' in window) {
-                        navigator.serviceWorker.ready.then(registration => {
-                            registration.showNotification('PWA图标测试', {
-                                body: '如果您看到这个通知，说明PWA图标配置正确',
-                                icon: './icon.svg',
-                                badge: './icon.svg',
-                                vibrate: [200, 100, 200]
-                            });
-                        });
-                    } else {
-                        alert('PWA功能不可用');
-                    }
-                };
-                document.body.appendChild(testButton);
-            }
+
         });
     </script>
 </body>
