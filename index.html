@@ -8,44 +8,11 @@
     <meta http-equiv="Expires" content="0">
     <title>EPUB 阅读器</title>
     
-    <!-- PWA 支持 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EPUB阅读器">
-    
-    <!-- 标准图标 -->
-    <link rel="icon" href="icon.svg" type="image/svg+xml">
-    <link rel="icon" href="icon.svg" sizes="any" type="image/svg+xml">
-    <link rel="shortcut icon" href="icon.svg" type="image/svg+xml">
-    
-    <!-- 备用图标（Base64编码的简单图标） -->
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMmMzZTUwIiByeD0iNCIvPgo8cmVjdCB4PSI0IiB5PSI2IiB3aWR0aD0iMjQiIGhlaWdodD0iMjAiIGZpbGw9IiNlY2YwZjEiIHJ4PSIyIi8+CjxsaW5lIHgxPSI2IiB5MT0iMTAiIHgyPSIyMiIgeTI9IjEwIiBzdHJva2U9IiNiZGMzYzciIHN0cm9rZS13aWR0aD0iMSIvPgo8bGluZSB4MT0iNiIgeTE9IjEzIiB4Mj0iMjAiIHkyPSIxMyIgc3Ryb2tlPSIjYmRjM2M3IiBzdHJva2Utd2lkdGg9IjEiLz4KPGxpbmUgeDE9IjYiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iI2JkYzNjNyIgc3Ryb2tlLXdpZHRoPSIxIi8+CjxyZWN0IHg9IjI0IiB5PSI0IiB3aWR0aD0iNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI2U3NGMzYyIgcng9IjIiLz4KPC9zdmc+" type="image/svg+xml">
-    
-    <!-- iOS Safari 图标 -->
-    <link rel="apple-touch-icon" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="152x152" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="144x144" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="120x120" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="114x114" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="76x76" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="72x72" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="60x60" href="icon.svg">
-    <link rel="apple-touch-icon" sizes="57x57" href="icon.svg">
-    
-    <!-- Android Chrome 图标 -->
-    <link rel="icon" type="image/svg+xml" sizes="192x192" href="icon.svg">
-    <link rel="icon" type="image/svg+xml" sizes="512x512" href="icon.svg">
-    <link rel="icon" type="image/svg+xml" sizes="96x96" href="icon.svg">
-    <link rel="icon" type="image/svg+xml" sizes="32x32" href="icon.svg">
-    <link rel="icon" type="image/svg+xml" sizes="16x16" href="icon.svg">
+
     
     <!-- 主题色 -->
     <meta name="theme-color" content="#2c3e50">
     <meta name="msapplication-TileColor" content="#2c3e50">
-    <meta name="msapplication-TileImage" content="icon.svg">
     
     <!-- PWA 额外配置 -->
     <meta name="application-name" content="EPUB阅读器">
@@ -130,6 +97,130 @@
             font-weight: bold;
             margin-left: auto;
         }
+        
+        /* 底部翻页栏样式 */
+        .page-controls {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            height: 60px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        
+
+        
+        .page-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 80px;
+            justify-content: center;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        
+        .page-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .page-btn-icon {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .page-btn-text {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .page-btn-text {
+                display: inline;
+            }
+        }
+        
+        .page-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+        }
+        
+        .page-number {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        /* 阅读器容器布局 */
+        .reader-container {
+            padding-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .page-controls {
+                padding: 10px 16px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+                height: 50px;
+            }
+            
+            .page-btn {
+                padding: 8px 10px;
+                min-width: 50px;
+            }
+            
+            .page-btn-text {
+                display: none;
+            }
+            
+            .page-btn-icon {
+                font-size: 18px;
+            }
+            
+            .page-number {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+        
+        /* 确保内容区域正确显示 */
+        .viewer iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+        }
+        
+
 
         .btn {
             background: #34495e;
@@ -187,6 +278,11 @@
             display: none;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
+        }
+        
+        .reader-container[style*="display: flex"] {
+            display: flex !important;
         }
 
 
@@ -199,6 +295,7 @@
             -webkit-user-select: none;
             user-select: none;
             overflow: hidden;
+            min-height: 0;
         }
 
         #viewer {
@@ -539,10 +636,7 @@
     <div class="header">
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
-            <button id="prevBtn" class="btn" disabled>上一页</button>
-            <button id="nextBtn" class="btn" disabled>下一页</button>
             <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
-            <div class="page-indicator">1</div>
         </div>
 
     </div>
@@ -561,11 +655,27 @@
             </p>
         </div>
 
+
+        
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
                 <div id="viewer"></div>
             </div>
-
+            
+            <!-- 底部翻页栏 -->
+            <div id="pageControls" class="page-controls">
+                <button id="prevBtn" class="page-btn" disabled>
+                    <span class="page-btn-icon">‹</span>
+                    <span class="page-btn-text">上一页</span>
+                </button>
+                <div class="page-info">
+                    <span id="pageNumber" class="page-number">1</span>
+                </div>
+                <button id="nextBtn" class="page-btn" disabled>
+                    <span class="page-btn-text">下一页</span>
+                    <span class="page-btn-icon">›</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -644,6 +754,10 @@
                 this.bookshelfBtn = document.getElementById('bookshelfBtn');
                 this.addBookBtn = document.getElementById('addBookBtn');
                 
+                // 翻页栏
+                this.pageControls = document.getElementById('pageControls');
+                this.pageNumber = document.getElementById('pageNumber');
+                
                 // 目录
                 this.tocPanel = document.getElementById('tocPanel');
                 this.tocList = document.getElementById('tocList');
@@ -701,6 +815,9 @@
                 
                 // 禁用页面滚动和移动
                 this.disablePageScroll();
+                
+                // 添加翻页栏触摸手势
+                this.bindPageControlsEvents();
             }
             
             disablePageScroll() {
@@ -755,6 +872,11 @@
                         e.stopPropagation();
                     });
                 }
+            }
+            
+            // 绑定翻页栏事件
+            bindPageControlsEvents() {
+                // 翻页栏现在是固定显示的，不需要触摸手势
             }
 
             async loadBook(file) {
@@ -839,6 +961,7 @@
                 this.loading.style.display = 'block';
                 this.welcome.style.display = 'none';
                 this.readerContainer.style.display = 'none';
+                this.hidePageControls();
                 
                 // 更新加载文本
                 const loadingText = this.loading.querySelector('p');
@@ -895,6 +1018,22 @@
 
 
 
+            showPageControls() {
+                // 翻页栏现在是固定显示的，不需要额外处理
+            }
+            
+            hidePageControls() {
+                // 翻页栏现在是固定显示的，不需要隐藏
+            }
+            
+            updatePageNumber(location) {
+                if (this.pageNumber && location) {
+                    // 计算当前页码
+                    const currentPage = location.start.location || 1;
+                    this.pageNumber.textContent = currentPage;
+                }
+            }
+            
             updateNavigation() {
                 const hasBook = !!this.book;
                 this.prevBtn.disabled = !hasBook;
@@ -1536,14 +1675,14 @@
             if (!navigator.onLine) {
                 console.log('应用处于离线状态');
                 // 可以在这里添加离线提示
-            } else {
+                } else {
                 console.log('应用已连接到网络');
             }
         }
         
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
-        
+
         // 初始化阅读器
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
