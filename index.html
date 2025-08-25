@@ -123,6 +123,24 @@
             z-index: 1000;
         }
         
+        /* 桌面端优化 */
+        @media (min-width: 769px) {
+            .page-controls {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
+            }
+            
+            .reader-container {
+                padding-bottom: 0;
+            }
+            
+            .viewer {
+                height: 100%;
+            }
+        }
+        
 
         
         .page-btn {
@@ -204,6 +222,19 @@
                 padding-bottom: calc(10px + env(safe-area-inset-bottom));
                 height: 50px;
                 background: rgba(44, 62, 80, 0.98);
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            
+            .reader-container {
+                padding-bottom: 50px; /* 为固定的底部导航栏留出空间 */
+            }
+            
+            .viewer {
+                height: calc(100% - 50px); /* 减去底部导航栏的高度 */
             }
             
             .page-btn {
@@ -230,8 +261,21 @@
         /* PWA 和全屏模式优化 */
         @media (display-mode: standalone) {
             .page-controls {
-                padding-bottom: calc(12px + env(safe-area-inset-bottom) + 10px);
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
                 background: rgba(44, 62, 80, 0.98);
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            
+            .reader-container {
+                padding-bottom: 60px; /* 为固定的底部导航栏留出空间 */
+            }
+            
+            .viewer {
+                height: calc(100% - 60px); /* 减去底部导航栏的高度 */
             }
         }
         
@@ -241,6 +285,19 @@
                 height: 40px;
                 padding: 8px 16px;
                 padding-bottom: calc(8px + env(safe-area-inset-bottom));
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            
+            .reader-container {
+                padding-bottom: 40px; /* 为固定的底部导航栏留出空间 */
+            }
+            
+            .viewer {
+                height: calc(100% - 40px); /* 减去底部导航栏的高度 */
             }
             
             .page-btn {
