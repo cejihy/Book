@@ -24,15 +24,18 @@
         .header {
             background: #2c3e50;
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 300;
         }
 
@@ -49,14 +52,20 @@
         .file-label {
             background: #3498db;
             color: white;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.3s;
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         .file-label:hover {
             background: #2980b9;
+        }
+        
+        .file-label:active {
+            transform: scale(0.95);
         }
 
         .controls {
@@ -69,14 +78,20 @@
             background: #34495e;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.3s;
+            font-size: 0.85rem;
+            min-width: 50px;
         }
 
         .btn:hover {
             background: #2c3e50;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .btn:disabled {
@@ -152,6 +167,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         .navigation {
@@ -194,8 +210,8 @@
         .toc-panel {
             position: fixed;
             top: 0;
-            left: -300px;
-            width: 300px;
+            left: -280px;
+            width: 280px;
             height: 100vh;
             background: white;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -206,6 +222,80 @@
 
         .toc-panel.open {
             left: 0;
+        }
+        
+        /* 移动设备优化 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 12px;
+            }
+            
+            .header h1 {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                gap: 6px;
+            }
+            
+            .btn {
+                padding: 5px 8px;
+                font-size: 0.8rem;
+                min-width: 45px;
+            }
+            
+            .file-label {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .toc-panel {
+                width: 260px;
+                left: -260px;
+            }
+            
+            .toc-item {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .welcome {
+                padding: 30px 15px;
+            }
+            
+            .welcome h2 {
+                font-size: 1.3rem;
+            }
+            
+            .welcome p {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 超小屏幕优化 */
+        @media (max-width: 480px) {
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .controls {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 8px;
+            }
+            
+            .file-input-container {
+                order: 2;
+            }
+            
+            .header h1 {
+                order: 1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 8px;
+            }
         }
 
         .toc-header {
@@ -235,6 +325,8 @@
             border-bottom: 1px solid #ecf0f1;
             cursor: pointer;
             transition: background 0.3s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
 
@@ -532,7 +624,31 @@
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
             
-
+            // 移动设备优化
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // 禁用双击缩放
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', function (event) {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // 禁用页面缩放
+                document.addEventListener('gesturestart', function (e) {
+                    e.preventDefault();
+                });
+                
+                document.addEventListener('gesturechange', function (e) {
+                    e.preventDefault();
+                });
+                
+                document.addEventListener('gestureend', function (e) {
+                    e.preventDefault();
+                });
+            }
         });
     </script>
 </body>
