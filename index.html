@@ -401,7 +401,8 @@
                     this.rendition = this.book.renderTo(this.viewer, {
                         width: '100%',
                         height: '100%',
-                        flow: 'paginated'
+                        flow: 'paginated',
+                        manager: 'default'
                     });
                     
                     // 绑定渲染器事件
@@ -410,9 +411,9 @@
                         this.updateNavigation();
                     });
                     
-                    // 处理EPUB内容中的内部链接
+                    // 处理EPUB内容中的链接
                     this.rendition.on('rendered', (section) => {
-                        this.handleInternalLinks(section);
+                        this.handleEpubLinks(section);
                     });
                     
 
@@ -466,64 +467,6 @@
                 this.nextBtn.disabled = !hasBook;
                 this.tocBtn.disabled = !hasBook;
             }
-            
-            handleInternalLinks(section) {
-                // 获取当前渲染的文档
-                const doc = section.document;
-                if (!doc) return;
-                
-                // 处理所有内部链接
-                const links = doc.querySelectorAll('a[href]');
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    
-                    // 检查是否是内部链接
-                    if (href && (href.startsWith('#') || href.includes('.html') || href.includes('.xhtml'))) {
-                        // 移除href属性，防止浏览器处理
-                        link.removeAttribute('href');
-                        link.setAttribute('data-href', href);
-                        
-                        // 阻止默认行为
-                        link.addEventListener('click', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            this.handleInternalLink(href);
-                            return false;
-                        });
-                        
-                        // 移动设备触摸事件
-                        link.addEventListener('touchstart', (event) => {
-                            event.preventDefault();
-                        }, { passive: false });
-                        
-                        link.addEventListener('touchend', (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            this.handleInternalLink(href);
-                            return false;
-                        }, { passive: false });
-                        
-                        // 添加视觉提示
-                        link.style.cursor = 'pointer';
-                        link.style.textDecoration = 'underline';
-                        link.style.color = '#0066cc';
-                    }
-                });
-            }
-            
-            async handleInternalLink(href) {
-                try {
-                    if (href.startsWith('#')) {
-                        // 锚点链接，在当前页面内跳转
-                        await this.rendition.display(href);
-                    } else {
-                        // 其他内部链接，使用epubjs导航
-                        await this.rendition.display(href);
-                    }
-                } catch (error) {
-                    console.error('内部链接导航失败:', error);
-                }
-            }
 
             renderToc() {
                 this.tocList.innerHTML = '';
@@ -575,6 +518,58 @@
                     }
                 }
             }
+            
+            handleEpubLinks(section) {
+                // 获取epubjs渲染的文档
+                const doc = section.document;
+                if (!doc) return;
+                
+                // 处理所有链接
+                const links = doc.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    
+                    // 检查是否是内部链接
+                    if (href && (href.includes('.html') || href.includes('.xhtml') || href.startsWith('#'))) {
+                        // 移除原始href
+                        link.removeAttribute('href');
+                        
+                        // 添加点击事件
+                        link.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            this.handleEpubLink(href);
+                            return false;
+                        });
+                        
+                        // 移动设备触摸事件
+                        link.addEventListener('touchstart', (event) => {
+                            event.preventDefault();
+                        }, { passive: false });
+                        
+                        link.addEventListener('touchend', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            this.handleEpubLink(href);
+                            return false;
+                        }, { passive: false });
+                        
+                        // 保持链接样式
+                        link.style.cursor = 'pointer';
+                        link.style.textDecoration = 'underline';
+                        link.style.color = '#0066cc';
+                    }
+                });
+            }
+            
+            async handleEpubLink(href) {
+                try {
+                    // 使用epubjs的导航方法
+                    await this.rendition.display(href);
+                } catch (error) {
+                    console.error('EPUB链接导航失败:', error);
+                }
+            }
 
             toggleToc() {
                 this.tocPanel.classList.add('open');
@@ -595,25 +590,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
             
-            // 全局拦截EPUB内容中的链接点击
-            document.addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'A' && target.closest('#viewer')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-            }, true);
-            
-            // 移动设备专用：拦截触摸事件
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                document.addEventListener('touchstart', (event) => {
-                    const target = event.target;
-                    if (target.tagName === 'A' && target.closest('#viewer')) {
-                        event.preventDefault();
-                    }
-                }, { passive: false });
-            }
+
         });
     </script>
 </body>
