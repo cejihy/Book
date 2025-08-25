@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>EPUB 阅读器</title>
     <script src="jszip.min.js"></script>
     <script src="epub.min.js"></script>
@@ -146,12 +146,29 @@
             flex: 1;
             background: white;
             position: relative;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: grab;
+        }
+
+        .viewer:active {
+            cursor: grabbing;
         }
 
         #viewer {
             width: 100%;
             height: 100%;
             border: none;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .navigation {
@@ -284,7 +301,6 @@
 </head>
 <body>
     <div class="header">
-        <h1>EPUB 阅读器</h1>
         <div class="file-input-container">
             <input type="file" id="fileInput" class="file-input" accept=".epub">
             <label for="fileInput" class="file-label">选择 EPUB 文件</label>
@@ -376,6 +392,9 @@
                 this.tocBtn.addEventListener('click', () => this.toggleToc());
                 this.tocClose.addEventListener('click', () => this.closeToc());
                 this.overlay.addEventListener('click', () => this.closeToc());
+                
+                // 添加触摸翻页支持
+                this.initTouchNavigation();
             }
 
             async loadBook(file) {
@@ -531,6 +550,65 @@
             closeToc() {
                 this.tocPanel.classList.remove('open');
                 this.overlay.classList.remove('show');
+            }
+
+            initTouchNavigation() {
+                let startX = 0;
+                let startY = 0;
+                let endX = 0;
+                let endY = 0;
+                let isSwiping = false;
+                const minSwipeDistance = 50; // 最小滑动距离
+                const maxVerticalSwipe = 100; // 最大垂直滑动容忍度
+
+                const handleTouchStart = (e) => {
+                    if (e.touches.length === 1) {
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        isSwiping = false;
+                    }
+                };
+
+                const handleTouchMove = (e) => {
+                    if (e.touches.length === 1 && !isSwiping) {
+                        const currentX = e.touches[0].clientX;
+                        const currentY = e.touches[0].clientY;
+                        const deltaX = Math.abs(currentX - startX);
+                        const deltaY = Math.abs(currentY - startY);
+
+                        // 如果水平滑动距离大于垂直滑动距离，且超过最小距离，则认为是翻页手势
+                        if (deltaX > deltaY && deltaX > minSwipeDistance) {
+                            isSwiping = true;
+                            e.preventDefault(); // 阻止默认滚动
+                        }
+                    }
+                };
+
+                const handleTouchEnd = (e) => {
+                    if (e.changedTouches.length === 1 && isSwiping) {
+                        endX = e.changedTouches[0].clientX;
+                        endY = e.changedTouches[0].clientY;
+                        
+                        const deltaX = endX - startX;
+                        const deltaY = Math.abs(endY - startY);
+
+                        // 确保是水平滑动且垂直偏移不大
+                        if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalSwipe) {
+                            if (deltaX > 0) {
+                                // 向右滑动 - 上一页
+                                this.prevPage();
+                            } else {
+                                // 向左滑动 - 下一页
+                                this.nextPage();
+                            }
+                        }
+                    }
+                };
+
+                // 为viewer容器添加触摸事件监听
+                this.viewer.addEventListener('touchstart', handleTouchStart, { passive: false });
+                this.viewer.addEventListener('touchmove', handleTouchMove, { passive: false });
+                this.viewer.addEventListener('touchend', handleTouchEnd, { passive: true });
             }
             
 
