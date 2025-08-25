@@ -15,6 +15,7 @@
     <meta name="theme-color" content="#2c3e50">
     <script src="jszip.min.js"></script>
     <script src="epub.min.js"></script>
+    <script src="hammer.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -232,65 +233,7 @@
             border-color: rgba(231, 76, 60, 0.5);
         }
 
-        /* 简单的翻页覆盖层 */
-        .simple-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none;
-        }
 
-        .simple-overlay.active {
-            pointer-events: auto;
-        }
-
-        .simple-overlay.text-mode {
-            pointer-events: none;
-        }
-
-        .simple-overlay .left-zone {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 30%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .simple-overlay .right-zone {
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 30%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        /* 模式指示器 */
-        .mode-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-        }
-
-        .mode-indicator.text-mode {
-            background: rgba(231, 76, 60, 0.8);
-        }
-
-        .mode-indicator.page-mode {
-            background: rgba(52, 152, 219, 0.8);
-        }
 
         #viewer {
             width: 100%;
@@ -684,7 +627,6 @@
                     <p><strong>鼠标操作：</strong></p>
                     <p>• 点击阅读区域左侧 ← 上一页</p>
                     <p>• 点击阅读区域右侧 → 下一页</p>
-                    <p>• 长按阅读区域 → 切换文字选择模式</p>
                     <p><strong>键盘操作：</strong></p>
                     <p>• 左箭头键 / A键 ← 上一页</p>
                     <p>• 右箭头键 / D键 → 下一页</p>
@@ -706,10 +648,6 @@
                 <div id="debugAreaLeft" class="debug-area left">左侧翻页区域</div>
                 <div id="debugAreaRight" class="debug-area right">右侧翻页区域</div>
                 <div id="debugAreaCenter" class="debug-area center">中间区域（无操作）</div>
-                <div id="simpleOverlay" class="simple-overlay">
-                    <div class="left-zone" id="leftZone"></div>
-                    <div class="right-zone" id="rightZone"></div>
-                </div>
             </div>
             
 
@@ -717,8 +655,6 @@
     </div>
 
     <div id="overlay" class="overlay"></div>
-    
-    <div id="modeIndicator" class="mode-indicator page-mode">翻页模式</div>
     
     <div id="installPrompt" class="install-prompt">
         <span>安装应用以获得更好的体验</span>
@@ -821,14 +757,6 @@
                 this.debugAreaLeft = document.getElementById('debugAreaLeft');
                 this.debugAreaRight = document.getElementById('debugAreaRight');
                 this.debugAreaCenter = document.getElementById('debugAreaCenter');
-                
-                // 简单覆盖层元素
-                this.simpleOverlay = document.getElementById('simpleOverlay');
-                this.leftZone = document.getElementById('leftZone');
-                this.rightZone = document.getElementById('rightZone');
-                
-                // 模式指示器
-                this.modeIndicator = document.getElementById('modeIndicator');
                 
                 // 手动更新按钮事件
                 this.manualUpdateBtn.addEventListener('click', () => {
@@ -1089,6 +1017,7 @@
                         e.preventDefault();
                         this.goToEnd();
                         break;
+
                 }
             }
 
@@ -1116,276 +1045,79 @@
                 }
             }
 
-            // 设置EPUB.js的点击事件
+
+
+
+
+            // 设置Hammer.js手势事件
             setupEpubClickEvents() {
+                console.log('=== 开始设置Hammer.js手势事件 ===');
+                console.log('rendition:', this.rendition);
+                console.log('viewer:', this.viewer);
+                
                 if (!this.rendition) {
                     console.error('EPUB渲染器未初始化');
                     return;
                 }
 
-                // 激活简单覆盖层
-                this.activateSimpleOverlay();
-
-                console.log('EPUB.js点击事件已设置');
-            }
-
-            // 处理鼠标按下事件
-            handleMouseDown(e) {
-                if (!this.rendition) return;
-
-                // 防止重复点击
-                const now = Date.now();
-                if (now - this.lastClickTime < this.clickCooldown) {
-                    console.log('鼠标点击过于频繁，忽略');
+                if (!this.viewer) {
+                    console.error('viewer元素未找到');
                     return;
                 }
 
-                console.log('鼠标按下事件:', e);
-
-                // 获取点击位置相对于viewer的坐标
-                const rect = this.viewer.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const width = rect.width;
-
-                // 验证点击位置是否合理
-                if (x < 0 || x > width) {
-                    console.log('鼠标点击位置异常，忽略:', x);
-                    return;
-                }
-
-                console.log('鼠标点击位置:', x, '宽度:', width);
-
-                // 使用更精确的区域检测
-                const leftBoundary = width * 0.3; // 30%作为左侧区域
-                const rightBoundary = width * 0.7; // 70%作为右侧区域
-
-                console.log('鼠标精确边界 - 左侧:', leftBoundary, '右侧:', rightBoundary);
-
-                // 左侧区域点击翻到上一页
-                if (x < leftBoundary) {
-                    console.log('鼠标触发上一页');
-                    this.lastClickTime = now;
-                    this.showPageHint('left');
-                    this.showPageIndicator('left');
-                    this.prevPage();
-                }
-                // 右侧区域点击翻到下一页
-                else if (x > rightBoundary) {
-                    console.log('鼠标触发下一页');
-                    this.lastClickTime = now;
-                    this.showPageHint('right');
-                    this.showPageIndicator('right');
-                    this.nextPage();
-                }
-                // 中间区域不执行任何操作
-                else {
-                    console.log('鼠标点击中间区域，不执行翻页');
-                }
-            }
-
-            // 激活简单覆盖层
-            activateSimpleOverlay() {
-                if (!this.simpleOverlay || !this.leftZone || !this.rightZone) {
-                    console.error('简单覆盖层元素未找到');
-                    return;
-                }
-
-                // 移除之前的事件监听器
-                this.leftZone.removeEventListener('click', this.handleLeftZoneClick.bind(this));
-                this.rightZone.removeEventListener('click', this.handleRightZoneClick.bind(this));
-
-                // 绑定新的事件监听器
-                this.leftZone.addEventListener('click', this.handleLeftZoneClick.bind(this));
-                this.rightZone.addEventListener('click', this.handleRightZoneClick.bind(this));
-
-                // 添加长按事件监听器
-                this.setupLongPressEvents();
-
-                // 激活覆盖层
-                this.simpleOverlay.classList.add('active');
-
-                console.log('简单覆盖层已激活');
-            }
-
-            // 设置长按事件
-            setupLongPressEvents() {
-                let longPressTimer = null;
-                const longPressDelay = 800; // 800毫秒长按
-
-                // 长按开始
-                const startLongPress = (e) => {
-                    e.preventDefault();
-                    longPressTimer = setTimeout(() => {
-                        this.toggleTextMode();
-                    }, longPressDelay);
-                };
-
-                // 长按结束
-                const endLongPress = () => {
-                    if (longPressTimer) {
-                        clearTimeout(longPressTimer);
-                        longPressTimer = null;
-                    }
-                };
-
-                // 在viewer上添加长按事件
-                this.viewer.addEventListener('mousedown', startLongPress);
-                this.viewer.addEventListener('mouseup', endLongPress);
-                this.viewer.addEventListener('mouseleave', endLongPress);
-                this.viewer.addEventListener('touchstart', startLongPress);
-                this.viewer.addEventListener('touchend', endLongPress);
-
-                // 监听文字选择事件，自动恢复翻页模式
-                document.addEventListener('selectionchange', () => {
-                    if (this.simpleOverlay.classList.contains('text-mode')) {
-                        const selection = window.getSelection();
-                        if (selection && selection.toString().length > 0) {
-                            // 有文字被选中，延迟恢复翻页模式
-                            setTimeout(() => {
-                                if (this.simpleOverlay.classList.contains('text-mode')) {
-                                    this.toggleTextMode();
-                                }
-                            }, 3000); // 3秒后自动恢复
-                        }
-                    }
+                // 创建Hammer实例
+                this.hammer = new Hammer(this.viewer);
+                
+                // 配置Hammer.js
+                this.hammer.get('tap').set({ time: 300 }); // 点击时间阈值
+                this.hammer.get('swipe').set({ 
+                    direction: Hammer.DIRECTION_HORIZONTAL,
+                    threshold: 50, // 滑动距离阈值
+                    velocity: 0.3  // 滑动速度阈值
                 });
+
+                // 监听点击事件
+                this.hammer.on('tap', (e) => {
+                    console.log('Hammer.js点击事件:', e);
+                    this.handleHammerTap(e);
+                });
+
+                // 监听左滑事件（下一页）
+                this.hammer.on('swipeleft', (e) => {
+                    console.log('Hammer.js左滑事件:', e);
+                    this.handleSwipeLeft(e);
+                });
+
+                // 监听右滑事件（上一页）
+                this.hammer.on('swiperight', (e) => {
+                    console.log('Hammer.js右滑事件:', e);
+                    this.handleSwipeRight(e);
+                });
+
+                console.log('Hammer.js手势事件已设置');
+                console.log('=== 手势事件设置完成 ===');
             }
 
-            // 切换文字选择模式
-            toggleTextMode() {
-                const isTextMode = this.simpleOverlay.classList.contains('text-mode');
+
+
+
+
+
+
+
+
+
+
+            // 处理Hammer.js点击事件
+            handleHammerTap(e) {
+                console.log('=== Hammer.js点击事件处理 ===');
+                console.log('事件对象:', e);
+                console.log('点击位置:', e.center);
                 
-                if (isTextMode) {
-                    // 切换到翻页模式
-                    this.simpleOverlay.classList.remove('text-mode');
-                    this.simpleOverlay.classList.add('active');
-                    this.updateModeIndicator('page');
-                    this.showModeHint('翻页模式已启用');
-                    console.log('切换到翻页模式');
-                } else {
-                    // 切换到文字选择模式
-                    this.simpleOverlay.classList.add('text-mode');
-                    this.simpleOverlay.classList.remove('active');
-                    this.updateModeIndicator('text');
-                    this.showModeHint('文字选择模式已启用');
-                    console.log('切换到文字选择模式');
-                }
-            }
-
-            // 更新模式指示器
-            updateModeIndicator(mode) {
-                if (!this.modeIndicator) return;
-                
-                this.modeIndicator.className = `mode-indicator ${mode}-mode`;
-                this.modeIndicator.textContent = mode === 'text' ? '文字选择模式' : '翻页模式';
-            }
-
-            // 显示模式提示
-            showModeHint(message) {
-                const hint = document.createElement('div');
-                hint.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(0, 0, 0, 0.8);
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 20px;
-                    font-size: 14px;
-                    z-index: 10000;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    backdrop-filter: blur(5px);
-                    animation: fadeInOut 2s ease-in-out forwards;
-                `;
-                hint.textContent = message;
-                
-                document.body.appendChild(hint);
-                
-                setTimeout(() => {
-                    if (hint.parentNode) {
-                        hint.parentNode.removeChild(hint);
-                    }
-                }, 2000);
-            }
-
-            // 处理左侧区域点击
-            handleLeftZoneClick(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('左侧区域被点击');
-                this.showPageHint('left');
-                this.showPageIndicator('left');
-                this.prevPage();
-            }
-
-            // 处理右侧区域点击
-            handleRightZoneClick(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('右侧区域被点击');
-                this.showPageHint('right');
-                this.showPageIndicator('right');
-                this.nextPage();
-            }
-
-            // 处理viewer点击事件
-            handleViewerClick(e) {
-                if (!this.rendition) return;
-
-                // 防止重复点击
-                const now = Date.now();
-                if (now - this.lastClickTime < this.clickCooldown) {
-                    console.log('viewer点击过于频繁，忽略');
+                if (!this.rendition || !this.viewer) {
+                    console.log('rendition或viewer未初始化，退出');
                     return;
                 }
-
-                console.log('viewer点击事件:', e);
-
-                // 获取点击位置相对于viewer的坐标
-                const rect = this.viewer.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const width = rect.width;
-
-                // 验证点击位置是否合理
-                if (x < 0 || x > width) {
-                    console.log('viewer点击位置异常，忽略:', x);
-                    return;
-                }
-
-                console.log('viewer点击位置:', x, '宽度:', width);
-
-                // 使用更精确的区域检测
-                const leftBoundary = width * 0.3; // 30%作为左侧区域
-                const rightBoundary = width * 0.7; // 70%作为右侧区域
-
-                console.log('viewer精确边界 - 左侧:', leftBoundary, '右侧:', rightBoundary);
-
-                // 左侧区域点击翻到上一页
-                if (x < leftBoundary) {
-                    console.log('viewer触发上一页');
-                    this.lastClickTime = now;
-                    this.showPageHint('left');
-                    this.showPageIndicator('left');
-                    this.prevPage();
-                }
-                // 右侧区域点击翻到下一页
-                else if (x > rightBoundary) {
-                    console.log('viewer触发下一页');
-                    this.lastClickTime = now;
-                    this.showPageHint('right');
-                    this.showPageIndicator('right');
-                    this.nextPage();
-                }
-                // 中间区域不执行任何操作
-                else {
-                    console.log('viewer点击中间区域，不执行翻页');
-                }
-            }
-
-            // 处理EPUB.js的点击事件
-            handleEpubClick(e) {
-                if (!this.rendition) return;
 
                 // 防止重复点击
                 const now = Date.now();
@@ -1394,30 +1126,42 @@
                     return;
                 }
 
-                console.log('EPUB点击事件:', e);
-
-                // 获取点击位置相对于viewer的坐标
-                const rect = this.viewer.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const width = rect.width;
-
-                // 验证点击位置是否合理
-                if (x < 0 || x > width || x > 1000) {
-                    console.log('点击位置异常，忽略:', x);
+                // 检查是否点击了按钮或其他交互元素
+                const target = e.target;
+                if (target.tagName === 'BUTTON' || target.closest('button')) {
+                    console.log('点击了按钮，忽略翻页');
                     return;
                 }
 
-                console.log('点击位置:', x, '宽度:', width, '左侧边界:', width / 3, '右侧边界:', width * 2 / 3);
+                // 检查是否点击了调试区域或其他UI元素
+                if (target.closest('.page-hint') || target.closest('.page-indicator') || target.closest('.debug-area')) {
+                    console.log('点击了UI元素，忽略翻页');
+                    return;
+                }
 
-                // 使用更精确的区域检测
+                // 获取点击位置相对于viewer的坐标
+                const rect = this.viewer.getBoundingClientRect();
+                const x = e.center.x - rect.left;
+                const width = rect.width;
+
+                console.log('Hammer点击位置:', x, '宽度:', width);
+                console.log('viewer位置信息:', rect);
+
+                // 验证点击位置是否合理
+                if (x < 0 || x > width) {
+                    console.log('点击位置超出viewer范围，忽略');
+                    return;
+                }
+
+                // 使用简单的区域检测
                 const leftBoundary = width * 0.3; // 30%作为左侧区域
                 const rightBoundary = width * 0.7; // 70%作为右侧区域
 
-                console.log('精确边界 - 左侧:', leftBoundary, '右侧:', rightBoundary);
+                console.log('边界 - 左侧:', leftBoundary, '右侧:', rightBoundary);
 
                 // 左侧区域点击翻到上一页
                 if (x < leftBoundary) {
-                    console.log('触发上一页');
+                    console.log('Hammer触发上一页');
                     this.lastClickTime = now;
                     this.showPageHint('left');
                     this.showPageIndicator('left');
@@ -1425,7 +1169,7 @@
                 }
                 // 右侧区域点击翻到下一页
                 else if (x > rightBoundary) {
-                    console.log('触发下一页');
+                    console.log('Hammer触发下一页');
                     this.lastClickTime = now;
                     this.showPageHint('right');
                     this.showPageIndicator('right');
@@ -1433,8 +1177,60 @@
                 }
                 // 中间区域不执行任何操作
                 else {
-                    console.log('点击中间区域，不执行翻页');
+                    console.log('Hammer点击中间区域，不执行翻页');
                 }
+            }
+
+            // 处理左滑事件（下一页）
+            handleSwipeLeft(e) {
+                console.log('=== Hammer.js左滑事件处理 ===');
+                
+                if (!this.rendition) {
+                    console.log('rendition未初始化，退出');
+                    return;
+                }
+
+                // 防止重复操作
+                const now = Date.now();
+                if (now - this.lastClickTime < this.clickCooldown) {
+                    console.log('操作过于频繁，忽略');
+                    return;
+                }
+
+                console.log('Hammer左滑触发下一页');
+                this.lastClickTime = now;
+                this.showPageHint('right');
+                this.showPageIndicator('right');
+                this.nextPage();
+            }
+
+            // 处理右滑事件（上一页）
+            handleSwipeRight(e) {
+                console.log('=== Hammer.js右滑事件处理 ===');
+                
+                if (!this.rendition) {
+                    console.log('rendition未初始化，退出');
+                    return;
+                }
+
+                // 防止重复操作
+                const now = Date.now();
+                if (now - this.lastClickTime < this.clickCooldown) {
+                    console.log('操作过于频繁，忽略');
+                    return;
+                }
+
+                console.log('Hammer右滑触发上一页');
+                this.lastClickTime = now;
+                this.showPageHint('left');
+                this.showPageIndicator('left');
+                this.prevPage();
+            }
+
+            // 处理EPUB.js的点击事件（备用方法）
+            handleEpubClick(e) {
+                console.log('EPUB.js点击事件触发，但使用viewer事件处理');
+                // 这个事件现在只是记录，实际处理由viewer点击事件完成
             }
 
             // 显示翻页区域指示器
@@ -1592,10 +1388,10 @@
                 
                 tip.innerHTML = `
                     <div style="margin-bottom: 10px; font-size: 18px;">📖</div>
-                    <div style="margin-bottom: 8px; font-weight: 600;">点击翻页已启用</div>
+                    <div style="margin-bottom: 8px; font-weight: 600;">手势翻页已启用</div>
                     <div style="font-size: 12px; opacity: 0.8;">
                         点击阅读区域左右30%区域即可翻页<br>
-                        长按阅读区域可切换文字选择模式<br>
+                        或左滑/右滑手势翻页<br>
                         或使用键盘：← → 箭头键 / A D键<br>
                         <small style="opacity: 0.7;">（点击🐛调试按钮可查看翻页区域）</small>
                     </div>
