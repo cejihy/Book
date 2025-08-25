@@ -433,8 +433,7 @@
             
             /* 特别处理可能挡住底部的元素 */
             .install-prompt,
-            .overlay,
-            #updateNotification {
+            .overlay {
                 display: none !important;
             }
         }
@@ -879,32 +878,13 @@
             // 手动更新方法
             manualUpdate() {
                 // 显示更新状态
-                this.manualUpdateBtn.textContent = '🔄 检查中...';
+                this.manualUpdateBtn.textContent = '🔄 更新中...';
                 this.manualUpdateBtn.disabled = true;
                 
-                // 使用全局更新检查函数
-                if (window.checkForUpdates) {
-                    window.checkForUpdates();
-                    
-                    // 3秒后检查是否有更新
-                    setTimeout(() => {
-                        if (this.manualUpdateBtn.textContent === '🔄 检查中...') {
-                            this.manualUpdateBtn.textContent = '✅ 已最新';
-                            this.manualUpdateBtn.style.background = '#27ae60';
-                            setTimeout(() => {
-                                this.manualUpdateBtn.textContent = '🔄 更新';
-                                this.manualUpdateBtn.style.background = '#27ae60';
-                                this.manualUpdateBtn.disabled = false;
-                            }, 2000);
-                        }
-                    }, 3000);
-                } else {
-                    // 如果没有全局函数，直接刷新页面
-                    this.manualUpdateBtn.textContent = '🔄 刷新中...';
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }
+                // 直接刷新页面获取最新版本
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             }
 
             async loadBook(file) {
@@ -1755,53 +1735,7 @@
                         .then((registration) => {
                             console.log('SW registered: ', registration);
                             
-                            // 检查更新
-                            function checkForUpdates() {
-                                registration.update().then(() => {
-                                    console.log('检查更新完成');
-                                }).catch(err => {
-                                    console.log('检查更新失败:', err);
-                                });
-                            }
-                            
-                            // 页面加载时立即检查更新
-                            checkForUpdates();
-                            
-                            // 每2分钟检查一次更新
-                            setInterval(checkForUpdates, 2 * 60 * 1000);
-                            
-                            // 添加全局更新检查函数
-                            window.checkForUpdates = checkForUpdates;
-                            
-                            // 监听 Service Worker 更新
-                            registration.addEventListener('updatefound', () => {
-                                console.log('发现Service Worker更新');
-                                const newWorker = registration.installing;
-                                
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        console.log('新版本已安装，等待激活');
-                                        
-                                        // 显示更新提示
-                                        showUpdateNotification();
-                                    }
-                                });
-                            });
-                            
-                            // 监听Service Worker激活
-                            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                                console.log('Service Worker已激活，页面将刷新');
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000);
-                            });
-                            
-                            // 监听页面可见性变化，当页面重新可见时检查更新
-                            document.addEventListener('visibilitychange', () => {
-                                if (!document.hidden) {
-                                    checkForUpdates();
-                                }
-                            });
+
                         })
                         .catch((registrationError) => {
                             console.log('SW registration failed: ', registrationError);
@@ -1809,66 +1743,7 @@
                 });
             }
             
-            // 显示更新提示
-            function showUpdateNotification() {
-                // 移除已存在的更新提示
-                const existingNotification = document.getElementById('updateNotification');
-                if (existingNotification) {
-                    existingNotification.remove();
-                }
-                
-                // 创建更新提示元素
-                const updateNotification = document.createElement('div');
-                updateNotification.id = 'updateNotification';
-                updateNotification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: #2c3e50;
-                    color: white;
-                    padding: 20px;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-                    z-index: 10000;
-                    font-size: 16px;
-                    text-align: center;
-                    min-width: 280px;
-                    border: 2px solid #3498db;
-                `;
-                updateNotification.innerHTML = `
-                    <div style="margin-bottom: 15px; font-weight: bold; color: #3498db;">🔄 发现新版本</div>
-                    <div style="margin-bottom: 20px; font-size: 14px;">应用已更新，点击下方按钮应用新版本</div>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="updateBtn" style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">立即更新</button>
-                        <button id="updateLater" style="background: transparent; color: white; border: 1px solid #95a5a6; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;">稍后</button>
-                    </div>
-                `;
-                
-                document.body.appendChild(updateNotification);
-                
-                // 绑定事件
-                document.getElementById('updateBtn').addEventListener('click', () => {
-                    updateNotification.innerHTML = '<div style="text-align: center;">🔄 正在更新...</div>';
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
-                });
-                
-                document.getElementById('updateLater').addEventListener('click', () => {
-                    updateNotification.remove();
-                });
-                
-                // 10秒后自动更新
-                setTimeout(() => {
-                    if (updateNotification.parentNode) {
-                        updateNotification.innerHTML = '<div style="text-align: center;">🔄 自动更新中...</div>';
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    }
-                }, 10000);
-            }
+
 
             // PWA 安装提示
             let deferredPrompt;

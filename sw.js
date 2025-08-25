@@ -1,4 +1,4 @@
-const CACHE_NAME = 'epub-reader-v8';
+const CACHE_NAME = 'epub-reader-v9';
 const urlsToCache = [
   './',
   './index.html',
@@ -69,6 +69,8 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+
 
 // 处理推送通知
 self.addEventListener('push', (event) => {
