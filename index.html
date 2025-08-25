@@ -375,10 +375,20 @@
                 padding: 0 !important;
             }
             
+            /* 确保头部正确显示 */
+            .header {
+                height: 50px !important;
+                min-height: 50px !important;
+                padding: 10px 15px !important;
+                padding-top: calc(10px + env(safe-area-inset-top)) !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+            }
+            
             /* 确保阅读器容器正确布局 */
             .reader-container {
-                height: 100vh !important;
-                height: 100dvh !important;
+                height: calc(100vh - 50px) !important;
+                height: calc(100dvh - 50px) !important;
                 overflow: hidden !important;
                 margin: 0 !important;
                 padding-bottom: 60px !important;
@@ -387,8 +397,8 @@
             
             /* 确保内容区域正确显示 */
             .viewer {
-                height: calc(100vh - 60px) !important;
-                height: calc(100dvh - 60px) !important;
+                height: calc(100vh - 110px) !important;
+                height: calc(100dvh - 110px) !important;
                 overflow: hidden !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -404,6 +414,8 @@
                 z-index: 1000 !important;
                 margin: 0 !important;
                 border: none !important;
+                height: 60px !important;
+                box-sizing: border-box !important;
             }
         }
         
@@ -1931,6 +1943,29 @@
                 document.documentElement.style.height = '100dvh';
                 document.documentElement.style.overflow = 'hidden';
                 
+                // 调整头部高度
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.height = '50px';
+                    header.style.minHeight = '50px';
+                    header.style.boxSizing = 'border-box';
+                }
+                
+                // 调整阅读器容器
+                const readerContainer = document.querySelector('.reader-container');
+                if (readerContainer) {
+                    readerContainer.style.height = 'calc(100vh - 50px)';
+                    readerContainer.style.height = 'calc(100dvh - 50px)';
+                    readerContainer.style.paddingBottom = '60px';
+                }
+                
+                // 调整内容区域
+                const viewer = document.querySelector('.viewer');
+                if (viewer) {
+                    viewer.style.height = 'calc(100vh - 110px)';
+                    viewer.style.height = 'calc(100dvh - 110px)';
+                }
+                
                 // 隐藏安装提示
                 const installPrompt = document.getElementById('installPrompt');
                 if (installPrompt) {
@@ -1938,6 +1973,22 @@
                 }
                 
                 console.log('PWA布局调整完成');
+                
+                // 调试信息
+                setTimeout(() => {
+                    const header = document.querySelector('.header');
+                    const readerContainer = document.querySelector('.reader-container');
+                    const viewer = document.querySelector('.viewer');
+                    const pageControls = document.querySelector('.page-controls');
+                    
+                    console.log('PWA调试信息:');
+                    console.log('Header高度:', header?.offsetHeight);
+                    console.log('Reader容器高度:', readerContainer?.offsetHeight);
+                    console.log('Viewer高度:', viewer?.offsetHeight);
+                    console.log('Page controls高度:', pageControls?.offsetHeight);
+                    console.log('窗口高度:', window.innerHeight);
+                    console.log('视口高度:', window.visualViewport?.height);
+                }, 100);
             }
         }
         
