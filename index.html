@@ -256,11 +256,15 @@
             
             /* PWA模式下正确的位置处理 */
             .header {
-                top: env(safe-area-inset-top);
+                top: 0;
+                padding-top: calc(10px + env(safe-area-inset-top));
+                min-height: calc(50px + env(safe-area-inset-top));
             }
             
             .footer {
-                bottom: env(safe-area-inset-bottom);
+                bottom: 0;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+                min-height: calc(50px + env(safe-area-inset-bottom));
             }
             
             #viewer {
