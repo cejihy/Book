@@ -61,6 +61,9 @@
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
+            /* 确保完全延伸到状态栏 */
+            margin-top: calc(-1 * env(safe-area-inset-top));
+            padding-top: calc(10px + env(safe-area-inset-top) * 2);
         }
         
         .header.hidden {
@@ -84,6 +87,9 @@
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
+            /* 确保完全延伸到底部 */
+            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+            padding-bottom: calc(10px + env(safe-area-inset-bottom) * 2);
         }
         
         .footer.hidden {
@@ -296,8 +302,8 @@
             background: white;
             user-select: none;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top));
-            padding-bottom: calc(50px + env(safe-area-inset-bottom));
+            padding-top: calc(50px + env(safe-area-inset-top) * 2);
+            padding-bottom: calc(50px + env(safe-area-inset-bottom) * 2);
         }
 
         /* 移除翻页区域指示器和调试区域样式 */
