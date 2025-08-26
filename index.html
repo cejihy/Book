@@ -147,6 +147,9 @@
             height: 100% !important;
             border: none !important;
             overflow: auto !important;
+            /* 确保iframe内容全屏显示 */
+            margin: 0 !important;
+            padding: 0 !important;
         }
         
         /* 触摸层样式 */
@@ -309,9 +312,6 @@
             bottom: 0;
             background: white;
             user-select: none;
-            /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top) * 2);
-            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
             overflow: auto;
         }
 
@@ -324,6 +324,9 @@
             height: 100%;
             border: none;
             user-select: none;
+            /* 为工具栏留出空间 */
+            padding-top: calc(50px + env(safe-area-inset-top) * 2);
+            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
         }
 
         /* 移除翻页提示样式 */
