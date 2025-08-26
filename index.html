@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -37,37 +37,60 @@
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: #f5f5f5;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
             margin: 0;
             padding: 0;
-            width: 100%;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            /* 延伸到状态栏 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .header {
-            background: #2c3e50;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(44, 62, 80, 0.95);
             color: white;
             padding: 10px 15px;
-            padding-top: 10px;
+            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             min-height: 50px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .header.hidden {
+            transform: translateY(-100%);
         }
         
         .footer {
-            background: #2c3e50;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(44, 62, 80, 0.95);
             color: white;
             padding: 10px 15px;
-            padding-bottom: 10px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
             min-height: 50px;
-            flex-shrink: 0; /* 防止被压缩 */
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .footer.hidden {
+            transform: translateY(100%);
         }
 
 
@@ -104,9 +127,9 @@
         
         /* 阅读器容器布局 */
         .reader-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
         }
         
         /* 确保内容区域正确显示 */
@@ -132,11 +155,10 @@
         .touch-area {
             position: absolute;
             top: 0;
-            height: calc(100% - 50px); /* 默认减去底部工具栏高度 */
+            height: 100%; /* 全屏触摸区域 */
             z-index: 10;
             pointer-events: auto;
             background: transparent;
-            transition: height 0.3s ease;
         }
         
         .touch-area.left {
@@ -223,9 +245,9 @@
 
 
         .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
 
@@ -267,11 +289,16 @@
 
 
         .viewer {
-            flex: 1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: white;
-            position: relative;
             user-select: none;
-            min-height: 0;
+            /* 延伸到状态栏 */
+            margin-top: calc(-1 * env(safe-area-inset-top));
+            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
         }
 
         /* 移除翻页区域指示器和调试区域样式 */
@@ -625,19 +652,21 @@
 
         <div id="welcome" class="welcome">
             <h2>EPUB 阅读器</h2>
-            <p>点击"书架"开始阅读</p>
+            <p>点击"书架"添加您的第一本书</p>
             <p style="margin-top: 20px; font-size: 14px; color: #3498db;">
-                💡 在书架中添加书籍，点击即可阅读
+                💡 支持触摸操作，享受沉浸式阅读体验
             </p>
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
                 <h3 style="margin-bottom: 15px; color: #2c3e50; font-size: 16px;">📖 阅读操作说明</h3>
                 <div style="font-size: 13px; line-height: 1.6; color: #555;">
-                    <p><strong>按钮操作：</strong></p>
-                    <p>• 点击"‹ 上一页"按钮 ← 上一页</p>
-                    <p>• 点击"下一页 ›"按钮 → 下一页</p>
-                    <p><strong>其他功能：</strong></p>
-                    <p>• 点击"目录"按钮查看书籍目录</p>
-                    <p>• 点击"书架"按钮管理书籍</p>
+                    <p><strong>触摸操作：</strong></p>
+                    <p>• 左右滑动 → 翻页（全屏区域）</p>
+                    <p>• 点击屏幕中间 → 显示/隐藏工具栏</p>
+                    <p>• 点击屏幕左侧 → 上一页</p>
+                    <p>• 点击屏幕右侧 → 下一页</p>
+                    <p><strong>工具栏功能：</strong></p>
+                    <p>• 顶部：书架管理、应用更新</p>
+                    <p>• 底部：目录导航、翻页控制</p>
                 </div>
             </div>
         </div>
@@ -1856,18 +1885,53 @@
                 // 切换控制栏显示状态
                 const header = document.querySelector('.header');
                 const footer = document.querySelector('.footer');
-                const touchAreas = document.querySelectorAll('.touch-area');
+                const viewer = document.querySelector('.viewer');
                 
                 if (header && footer) {
-                    const isVisible = header.style.display !== 'none';
-                    const newDisplay = isVisible ? 'none' : 'flex';
-                    header.style.display = newDisplay;
-                    footer.style.display = newDisplay;
+                    const isVisible = !header.classList.contains('hidden');
                     
-                    // 调整触摸区域高度
-                    touchAreas.forEach(area => {
-                        area.style.height = isVisible ? '100%' : 'calc(100% - 50px)';
-                    });
+                    if (isVisible) {
+                        // 隐藏工具栏
+                        header.classList.add('hidden');
+                        footer.classList.add('hidden');
+                        
+                        // 禁用页面移动和缩放
+                        if (viewer) {
+                            viewer.style.touchAction = 'none';
+                            viewer.style.overflow = 'hidden';
+                        }
+                        
+                        // 禁用body的滚动和缩放
+                        document.body.style.overflow = 'hidden';
+                        document.body.style.touchAction = 'none';
+                        
+                        // 禁用iframe内的滚动和缩放
+                        const iframe = viewer?.querySelector('iframe');
+                        if (iframe) {
+                            iframe.style.pointerEvents = 'none';
+                        }
+                        
+                    } else {
+                        // 显示工具栏
+                        header.classList.remove('hidden');
+                        footer.classList.remove('hidden');
+                        
+                        // 恢复页面移动和缩放
+                        if (viewer) {
+                            viewer.style.touchAction = '';
+                            viewer.style.overflow = '';
+                        }
+                        
+                        // 恢复body的滚动和缩放
+                        document.body.style.overflow = '';
+                        document.body.style.touchAction = '';
+                        
+                        // 恢复iframe内的交互
+                        const iframe = viewer?.querySelector('iframe');
+                        if (iframe) {
+                            iframe.style.pointerEvents = '';
+                        }
+                    }
                 }
             }
             
