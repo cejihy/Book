@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, minimal-ui">
     <title>应用界面</title>
     
     <!-- PWA Meta Tags -->
@@ -75,6 +75,74 @@
         @media (orientation: portrait) {
             body {
                 padding-bottom: 0;
+            }
+        }
+
+        /* 强制隐藏所有底部额外元素 */
+        *[style*="bottom: 0"]:not(.footer) {
+            display: none !important;
+        }
+
+        /* 确保Footer是唯一的底部元素 */
+        .footer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+        }
+
+        /* 移除所有可能的底部空间 */
+        html, body {
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* 强制全屏模式 */
+        @media (display-mode: standalone) {
+            html, body {
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
+            }
+        }
+
+        /* 更强力的底部栏移除 */
+        html, body {
+            height: 100vh !important;
+            height: 100dvh !important;
+            overflow: hidden !important;
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* 确保Footer绝对贴底 */
+        .footer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+            z-index: 9999 !important;
+        }
+
+        /* 隐藏所有可能的底部元素 */
+        * {
+            margin-bottom: 0 !important;
+        }
+
+        /* 特殊处理PWA模式 */
+        @media (display-mode: standalone) {
+            html, body {
+                height: 100vh !important;
+                height: 100dvh !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .footer {
+                bottom: 0 !important;
+                padding-bottom: 0 !important;
             }
         }
 
@@ -862,15 +930,33 @@
             function handleBottomBar() {
                 const footer = document.querySelector('.footer');
                 const body = document.body;
+                const html = document.documentElement;
                 
                 // 强制设置底部位置
                 footer.style.bottom = '0px';
                 footer.style.paddingBottom = '0px';
                 footer.style.marginBottom = '0px';
+                footer.style.position = 'fixed';
+                footer.style.zIndex = '9999';
                 
-                // 移除body的底部padding
+                // 移除body和html的底部padding
                 body.style.paddingBottom = '0px';
                 body.style.marginBottom = '0px';
+                html.style.paddingBottom = '0px';
+                html.style.marginBottom = '0px';
+                
+                // 强制设置高度
+                body.style.height = '100vh';
+                html.style.height = '100vh';
+                
+                // 查找并移除可能的底部元素
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    if (el.style.position === 'fixed' && el.style.bottom === '0px' && el !== footer) {
+                        el.style.display = 'none';
+                        console.log('隐藏了底部元素:', el);
+                    }
+                });
                 
                 console.log('底部栏处理完成');
             }
@@ -885,6 +971,9 @@
             window.addEventListener('orientationchange', () => {
                 setTimeout(handleBottomBar, 100);
             });
+            
+            // 定期检查
+            setInterval(handleBottomBar, 1000);
         });
     </script>
 </body>
