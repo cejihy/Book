@@ -47,6 +47,11 @@
             height: env(safe-area-inset-top);
             background: #007AFF;
             z-index: 10000;
+            transition: transform 0.3s ease;
+        }
+        
+        .status-bar.hidden {
+            transform: translateY(-100%);
         }
 
         /* 顶部导航栏 - 微信风格 */
@@ -64,6 +69,7 @@
             min-height: 44px;
             z-index: 1000;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
         
         .header.hidden {
@@ -284,7 +290,7 @@
         .overlay.show {
             display: block;
         }
-
+        
         /* 侧边面板 - 微信风格 */
         .toc-panel, .bookshelf-panel {
             position: fixed;
@@ -476,8 +482,8 @@
                 <div id="pageIndicatorRight" class="page-indicator right">›</div>
             </div>
         </div>
-    </div>
-    
+            </div>
+            
     <!-- 底部标签栏 -->
     <div class="footer">
         <div class="footer-btn" id="tocBtn">
@@ -536,7 +542,7 @@
                 this.welcome = document.getElementById('welcome');
                 this.readerContainer = document.getElementById('readerContainer');
                 this.viewer = document.getElementById('viewer');
-
+                
                 // 按钮
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
@@ -640,12 +646,12 @@
                         <h2>第${this.currentPage}页</h2>
                         <div>
                             ${content}
-                        </div>
+                    </div>
                         <div class="page-info">
                             ${this.currentPage} / ${this.totalPages}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
             }
 
             generateBookContent() {
@@ -778,16 +784,19 @@
             }
 
             toggleControls() {
+                const statusBar = document.querySelector('.status-bar');
                 const header = document.querySelector('.header');
                 const footer = document.querySelector('.footer');
                 
-                if (header && footer) {
+                if (statusBar && header && footer) {
                     const isVisible = !header.classList.contains('hidden');
                     
                     if (isVisible) {
+                        statusBar.classList.add('hidden');
                         header.classList.add('hidden');
                         footer.classList.add('hidden');
                     } else {
+                        statusBar.classList.remove('hidden');
                         header.classList.remove('hidden');
                         footer.classList.remove('hidden');
                     }
