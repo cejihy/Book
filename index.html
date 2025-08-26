@@ -48,9 +48,6 @@
             width: 100vw;
             height: 100vh;
             overflow: auto;
-            /* 隐藏状态栏 */
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .header {
@@ -263,6 +260,9 @@
             width: 100vw;
             height: 100vh;
             overflow: auto;
+            /* 确保完全填充屏幕 */
+            margin: 0;
+            padding: 0;
         }
 
         .loading {
@@ -289,15 +289,14 @@
         }
 
         .reader-container {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
             position: relative;
+            height: 100vh;
+            width: 100vw;
+            display: none;
         }
         
-        .reader-container[style*="display: flex"] {
-            display: flex !important;
+        .reader-container[style*="display: block"] {
+            display: block !important;
         }
 
 
@@ -312,7 +311,7 @@
             user-select: none;
             /* 为工具栏留出空间 */
             padding-top: calc(50px + env(safe-area-inset-top) * 2);
-            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
             overflow: auto;
         }
 
@@ -1069,7 +1068,7 @@
 
             showReader() {
                 this.hideLoading();
-                this.readerContainer.style.display = 'flex';
+                this.readerContainer.style.display = 'block';
                 this.updateNavigation();
                 
                 // 初始化触摸层
