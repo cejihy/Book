@@ -60,7 +60,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            min-height: 50px;
+            min-height: calc(50px + env(safe-area-inset-top));
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
@@ -83,7 +83,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            min-height: 50px;
+            min-height: calc(50px + env(safe-area-inset-bottom));
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
@@ -159,6 +159,9 @@
             z-index: 10;
             pointer-events: auto;
             background: transparent;
+            /* 延伸到状态栏，但避开工具栏 */
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(50px + env(safe-area-inset-bottom));
         }
         
         .touch-area.left {
@@ -198,10 +201,12 @@
         
         .page-indicator.left {
             left: 20px;
+            top: calc(50% + env(safe-area-inset-top));
         }
         
         .page-indicator.right {
             right: 20px;
+            top: calc(50% + env(safe-area-inset-top));
         }
         
         .page-indicator.show {
@@ -296,9 +301,9 @@
             bottom: 0;
             background: white;
             user-select: none;
-            /* 延伸到状态栏 */
-            margin-top: calc(-1 * env(safe-area-inset-top));
-            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+            /* 延伸到状态栏，但为工具栏留出空间 */
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(50px + env(safe-area-inset-bottom));
         }
 
         /* 移除翻页区域指示器和调试区域样式 */
