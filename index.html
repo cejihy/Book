@@ -75,7 +75,7 @@
             transition: transform 0.3s ease;
             /* 延伸到状态栏，完全覆盖 */
             margin-top: calc(-1 * env(safe-area-inset-top));
-            padding-top: calc(10px + env(safe-area-inset-top) * 2);
+            padding-top: calc(10px + env(safe-area-inset-top));
         }
         
         .header.hidden {
@@ -101,7 +101,7 @@
             transition: transform 0.3s ease;
             /* 延伸到底部安全区域，完全覆盖 */
             margin-bottom: calc(-1 * env(safe-area-inset-bottom));
-            padding-bottom: calc(10px + env(safe-area-inset-bottom) * 2);
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
         
         .footer.hidden {
@@ -179,8 +179,8 @@
             height: 100%;
             pointer-events: auto;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top) * 2);
-            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(60px + env(safe-area-inset-bottom));
             touch-action: auto;
         }
 
@@ -214,6 +214,15 @@
             .viewer {
                 /* PWA模式下的阅读器特殊处理 */
                 overflow: auto;
+            }
+            
+            /* PWA模式下减少底部空间占用 */
+            #viewer {
+                padding-bottom: calc(60px + env(safe-area-inset-bottom) * 0.5);
+            }
+            
+            .touch-area {
+                padding-bottom: calc(60px + env(safe-area-inset-bottom) * 0.5);
             }
         }
         
@@ -358,8 +367,8 @@
             border: none;
             user-select: none;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top) * 2);
-            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(60px + env(safe-area-inset-bottom));
             /* 添加边框 */
             border: 1px solid #e0e0e0;
             border-radius: 8px;
