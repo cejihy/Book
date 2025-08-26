@@ -866,10 +866,77 @@
                 this.manualUpdateBtn.textContent = '🔄 更新中...';
                 this.manualUpdateBtn.disabled = true;
                 
-                // 直接刷新页面获取最新版本
+                // 显示更新提示
+                this.showUpdateMessage('正在检查更新...');
+                
+                // 检查是否有新版本（通过检查缓存）
+                if ('caches' in window) {
+                    caches.keys().then(cacheNames => {
+                        this.showUpdateMessage('正在清除缓存...');
+                        // 清除所有缓存
+                        return Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                    }).then(() => {
+                        this.showUpdateMessage('正在重新加载...');
+                        // 清除缓存后刷新页面
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 100);
+                    }).catch(() => {
+                        this.showUpdateMessage('更新失败，正在重试...');
+                        // 如果清除缓存失败，直接刷新
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 100);
+                    });
+                } else {
+                    this.showUpdateMessage('正在重新加载...');
+                    // 如果不支持缓存API，直接刷新
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 100);
+                }
+                
+                // 3秒后恢复按钮状态（防止无限等待）
                 setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                    this.manualUpdateBtn.textContent = '🔄 更新';
+                    this.manualUpdateBtn.disabled = false;
+                    this.hideUpdateMessage();
+                }, 3000);
+            }
+            
+            // 显示更新消息
+            showUpdateMessage(message) {
+                let updateMsg = document.getElementById('updateMessage');
+                if (!updateMsg) {
+                    updateMsg = document.createElement('div');
+                    updateMsg.id = 'updateMessage';
+                    updateMsg.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(44, 62, 80, 0.9);
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 8px;
+                        z-index: 10000;
+                        font-size: 14px;
+                        backdrop-filter: blur(10px);
+                    `;
+                    document.body.appendChild(updateMsg);
+                }
+                updateMsg.textContent = message;
+                updateMsg.style.display = 'block';
+            }
+            
+            // 隐藏更新消息
+            hideUpdateMessage() {
+                const updateMsg = document.getElementById('updateMessage');
+                if (updateMsg) {
+                    updateMsg.style.display = 'none';
+                }
             }
 
             async loadBook(file) {
