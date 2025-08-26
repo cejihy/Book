@@ -167,27 +167,161 @@
         /* 触摸区域样式 */
         .touch-area {
             position: absolute;
-            top: 0;
-            height: 100%; /* 全屏触摸区域 */
-            z-index: 10;
+            height: 100%;
             pointer-events: auto;
-            background: transparent;
+            /* 为工具栏留出空间 */
+            padding-top: calc(50px + env(safe-area-inset-top) * 2);
+            padding-bottom: calc(60px + env(safe-area-inset-bottom) * 2);
             touch-action: auto;
         }
-        
+
         .touch-area.left {
+            width: 30%;
             left: 0;
-            width: 30%;
         }
-        
-        .touch-area.right {
-            right: 0;
-            width: 30%;
-        }
-        
+
         .touch-area.center {
-            left: 30%;
             width: 40%;
+            left: 30%;
+        }
+
+        .touch-area.right {
+            width: 30%;
+            right: 0;
+        }
+
+        /* 调试模式样式 */
+        .debug-mode {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .debug-mode button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .debug-mode button:hover {
+            background: #c0392b;
+        }
+
+        /* 调试边框样式 */
+        .debug-border {
+            position: relative;
+        }
+
+        .debug-border::before,
+        .debug-border::after {
+            display: none;
+        }
+
+        .debug-border.debug-active::before,
+        .debug-border.debug-active::after {
+            display: block;
+        }
+
+        .debug-border::before {
+            content: attr(data-debug-name);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-family: monospace;
+            z-index: 10000;
+            border-radius: 0 0 3px 0;
+        }
+
+        .debug-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid rgba(255, 0, 0, 0.6);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 不同区域的调试颜色 */
+        .debug-header::before {
+            background: rgba(52, 152, 219, 0.8) !important;
+        }
+
+        .debug-header::after {
+            border-color: rgba(52, 152, 219, 0.6) !important;
+        }
+
+        .debug-footer::before {
+            background: rgba(46, 204, 113, 0.8) !important;
+        }
+
+        .debug-footer::after {
+            border-color: rgba(46, 204, 113, 0.6) !important;
+        }
+
+        .debug-viewer::before {
+            background: rgba(155, 89, 182, 0.8) !important;
+        }
+
+        .debug-viewer::after {
+            border-color: rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .debug-touch::before {
+            background: rgba(241, 196, 15, 0.8) !important;
+        }
+
+        .debug-touch::after {
+            border-color: rgba(241, 196, 15, 0.6) !important;
+        }
+
+        .debug-touch-area::before {
+            background: rgba(230, 126, 34, 0.8) !important;
+        }
+
+        .debug-touch-area::after {
+            border-color: rgba(230, 126, 34, 0.6) !important;
+        }
+
+        .debug-main::before {
+            background: rgba(231, 76, 60, 0.8) !important;
+        }
+
+        .debug-main::after {
+            border-color: rgba(231, 76, 60, 0.6) !important;
+        }
+
+        .debug-welcome::before {
+            background: rgba(142, 68, 173, 0.8) !important;
+        }
+
+        .debug-welcome::after {
+            border-color: rgba(142, 68, 173, 0.6) !important;
+        }
+
+        .debug-loading::before {
+            background: rgba(52, 73, 94, 0.8) !important;
+        }
+
+        .debug-loading::after {
+            border-color: rgba(52, 73, 94, 0.6) !important;
         }
         
         /* 翻页提示指示器 */
@@ -653,8 +787,14 @@
 
     </style>
 </head>
-<body>
-    <div class="header">
+    <body>
+        <!-- 调试控制面板 -->
+        <div id="debugPanel" class="debug-mode">
+            <span>调试模式</span>
+            <button id="toggleDebug">开启</button>
+        </div>
+
+        <div class="header debug-border debug-header" data-debug-name="Header">
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
             <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
@@ -662,12 +802,12 @@
     </div>
 
     <div class="main-content">
-        <div id="loading" class="loading">
+        <div id="loading" class="loading debug-border debug-loading" data-debug-name="Loading">
             <div class="spinner"></div>
             <p>正在加载 EPUB 文件...</p>
         </div>
 
-        <div id="welcome" class="welcome">
+        <div id="welcome" class="welcome debug-border debug-welcome" data-debug-name="Welcome">
             <h2>EPUB 阅读器</h2>
             <p>点击"书架"添加您的第一本书</p>
             <p style="margin-top: 20px; font-size: 14px; color: #3498db;">
@@ -690,17 +830,17 @@
 
 
         
-        <div id="readerContainer" class="reader-container">
-            <div class="viewer">
-                <div id="viewer"></div>
+        <div id="readerContainer" class="reader-container debug-border debug-viewer" data-debug-name="ReaderContainer">
+            <div class="viewer debug-border debug-viewer" data-debug-name="Viewer">
+                <div id="viewer" class="debug-border debug-viewer" data-debug-name="ViewerContent"></div>
                 <!-- 触摸层 -->
-                <div id="touchLayer" class="touch-layer">
+                <div id="touchLayer" class="touch-layer debug-border debug-touch" data-debug-name="TouchLayer">
                     <!-- 左侧翻页区域 -->
-                    <div id="leftTouchArea" class="touch-area left"></div>
+                    <div id="leftTouchArea" class="touch-area left debug-border debug-touch-area" data-debug-name="LeftTouch"></div>
                     <!-- 中间控制区域 -->
-                    <div id="centerTouchArea" class="touch-area center"></div>
+                    <div id="centerTouchArea" class="touch-area center debug-border debug-touch-area" data-debug-name="CenterTouch"></div>
                     <!-- 右侧翻页区域 -->
-                    <div id="rightTouchArea" class="touch-area right"></div>
+                    <div id="rightTouchArea" class="touch-area right debug-border debug-touch-area" data-debug-name="RightTouch"></div>
                 </div>
                 <!-- 翻页指示器 -->
                 <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
@@ -709,7 +849,7 @@
         </div>
         
         <!-- 底部工具栏 -->
-        <div class="footer">
+        <div class="footer debug-border debug-footer" data-debug-name="Footer">
             <div class="footer-controls">
                 <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
                 <button id="prevBtn" class="btn">‹ 上一页</button>
@@ -2059,9 +2199,44 @@
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
+        // 调试模式控制
+        let debugMode = false;
+        
+        function toggleDebugMode() {
+            debugMode = !debugMode;
+            const debugPanel = document.getElementById('debugPanel');
+            const toggleBtn = document.getElementById('toggleDebug');
+            const debugElements = document.querySelectorAll('.debug-border');
+            
+            if (debugMode) {
+                toggleBtn.textContent = '关闭';
+                debugElements.forEach(el => {
+                    el.classList.add('debug-active');
+                });
+                console.log('🔍 调试模式已开启');
+            } else {
+                toggleBtn.textContent = '开启';
+                debugElements.forEach(el => {
+                    el.classList.remove('debug-active');
+                });
+                console.log('🔍 调试模式已关闭');
+            }
+        }
+        
+        // 初始化调试模式
+        function initDebugMode() {
+            const debugElements = document.querySelectorAll('.debug-border');
+            debugElements.forEach(el => {
+                el.classList.remove('debug-active');
+            });
+            
+            document.getElementById('toggleDebug').addEventListener('click', toggleDebugMode);
+        }
+
         // 初始化阅读器
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
+            initDebugMode();
             
             // 注册Service Worker
             if ('serviceWorker' in navigator) {
