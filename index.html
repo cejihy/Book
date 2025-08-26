@@ -52,7 +52,7 @@
         /* 主内容区域 */
         .main {
             padding-top: calc(env(safe-area-inset-top) + 44px);
-            padding-bottom: calc(env(safe-area-inset-bottom) + 49px);
+            padding-bottom: 49px;
             height: 100vh;
             height: 100dvh;
             overflow: auto;
@@ -75,11 +75,13 @@
             right: 0;
             background: white;
             border-top: 1px solid #e5e5e5;
-            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            padding: 8px 0;
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
+            /* 直接贴底，覆盖Home Indicator */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* 导航按钮 */
