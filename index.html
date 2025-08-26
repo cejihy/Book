@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -701,7 +701,7 @@
             <div class="footer-controls">
                 <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
                 <button id="prevBtn" class="btn">‹ 上一页</button>
-                <span id="pageNumber" class="page-number">4</span>
+                <span id="pageNumber" class="page-number">6</span>
                 <button id="nextBtn" class="btn">下一页 ›</button>
             </div>
         </div>
@@ -1890,7 +1890,6 @@
                 // 切换控制栏显示状态
                 const header = document.querySelector('.header');
                 const footer = document.querySelector('.footer');
-                const viewer = document.querySelector('.viewer');
                 
                 if (header && footer) {
                     const isVisible = !header.classList.contains('hidden');
@@ -1899,43 +1898,10 @@
                         // 隐藏工具栏
                         header.classList.add('hidden');
                         footer.classList.add('hidden');
-                        
-                        // 禁用页面移动和缩放
-                        if (viewer) {
-                            viewer.style.touchAction = 'none';
-                            viewer.style.overflow = 'hidden';
-                        }
-                        
-                        // 禁用body的滚动和缩放
-                        document.body.style.overflow = 'hidden';
-                        document.body.style.touchAction = 'none';
-                        
-                        // 禁用iframe内的滚动和缩放
-                        const iframe = viewer?.querySelector('iframe');
-                        if (iframe) {
-                            iframe.style.pointerEvents = 'none';
-                        }
-                        
                     } else {
                         // 显示工具栏
                         header.classList.remove('hidden');
                         footer.classList.remove('hidden');
-                        
-                        // 恢复页面移动和缩放
-                        if (viewer) {
-                            viewer.style.touchAction = '';
-                            viewer.style.overflow = '';
-                        }
-                        
-                        // 恢复body的滚动和缩放
-                        document.body.style.overflow = '';
-                        document.body.style.touchAction = '';
-                        
-                        // 恢复iframe内的交互
-                        const iframe = viewer?.querySelector('iframe');
-                        if (iframe) {
-                            iframe.style.pointerEvents = '';
-                        }
                     }
                 }
             }
