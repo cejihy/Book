@@ -343,7 +343,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: white;
+            background: transparent;
             user-select: none;
             overflow: auto;
         }
@@ -363,8 +363,10 @@
             /* 添加边框 */
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            margin: 10px;
-            background: #fafafa;
+            margin: 10px 10px 0 10px;
+            background: white;
+            /* 确保在工具栏隐藏时能完全填充 */
+            box-sizing: border-box;
         }
 
         /* 移除翻页提示样式 */
