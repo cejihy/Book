@@ -27,116 +27,110 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8f9fa;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
-            /* 标准PWA布局 - 只保留顶部安全区域 */
+            /* 现代PWA布局 - 参考微信、支付宝 */
             padding-top: env(safe-area-inset-top);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
 
-        /* 处理Home Indicator */
-        @supports (padding: max(0px)) {
-            body {
-                padding-bottom: max(0px, env(safe-area-inset-bottom));
-            }
-        }
-
-        /* 顶部工具栏 */
+        /* 顶部导航栏 - 参考微信设计 */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(44, 62, 80, 0.95);
-            color: white;
-            padding: 10px 15px;
+            background: #ffffff;
+            color: #333333;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            min-height: 50px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-height: 44px;
             z-index: 1000;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
             /* 安全区域适配 */
-            padding-top: calc(10px + env(safe-area-inset-top));
+            padding-top: calc(12px + env(safe-area-inset-top));
         }
         
         .header.hidden {
             transform: translateY(-100%);
         }
         
-        /* 底部工具栏 */
+        /* 底部标签栏 - 参考微信底部导航 */
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(44, 62, 80, 0.95);
-            color: white;
-            padding: 10px 15px;
+            background: #ffffff;
+            color: #666666;
+            padding: 8px 0;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            min-height: 50px;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            min-height: 49px;
             z-index: 1000;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-
-        /* 确保底部工具栏在Home Indicator上方 */
-        @supports (padding: max(0px)) {
-            .footer {
-                bottom: max(0px, env(safe-area-inset-bottom));
-            }
         }
         
         .footer.hidden {
             transform: translateY(100%);
         }
 
-        /* 按钮样式 */
+        /* 按钮样式 - 现代设计 */
         .btn {
-            background: #34495e;
+            background: #007aff;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.2s ease;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .btn:hover {
-            background: #2c3e50;
+            background: #0056cc;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn:disabled {
-            background: #95a5a6;
+            background: #e5e5ea;
+            color: #8e8e93;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .page-number {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            min-width: 30px;
-            text-align: center;
-            margin: 0 8px;
-        }
-        
-        .footer-controls {
+        /* 底部导航按钮 */
+        .footer-btn {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
             align-items: center;
+            padding: 4px 8px;
+            color: #8e8e93;
+            text-decoration: none;
+            font-size: 10px;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .footer-btn.active {
+            color: #007aff;
+        }
+
+        .footer-btn-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
         }
 
         /* 主内容区域 */
@@ -145,33 +139,36 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top));
-            padding-bottom: 50px;
+            /* 为导航栏留出空间 */
+            padding-top: calc(44px + env(safe-area-inset-top));
+            padding-bottom: 49px;
         }
 
-        /* 欢迎页面 */
+        /* 欢迎页面 - 现代卡片设计 */
         .welcome {
             text-align: center;
-            padding: 50px 20px;
-            color: #7f8c8d;
+            padding: 32px 20px;
+            color: #333333;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .welcome h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 24px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 600;
         }
 
         .welcome p {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             line-height: 1.6;
             font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         /* 阅读器容器 */
@@ -180,28 +177,26 @@
             width: 100%;
             height: 100%;
             display: none;
+            background: #ffffff;
         }
         
         .reader-container[style*="display: block"] {
             display: block !important;
         }
 
-        /* 内容查看器 */
+        /* 内容查看器 - 现代阅读器设计 */
         .viewer {
             position: relative;
             width: 100%;
             height: 100%;
-            background: white;
+            background: #ffffff;
             overflow: auto;
-            border-radius: 8px;
-            margin: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
 
         #viewer {
             width: 100%;
             height: 100%;
-            padding: 20px;
             box-sizing: border-box;
         }
 
@@ -238,20 +233,20 @@
             right: 0;
         }
 
-        /* 翻页指示器 */
+        /* 翻页指示器 - 现代设计 */
         .page-indicator {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             width: 40px;
-            height: 80px;
-            background: rgba(44, 62, 80, 0.8);
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            border-radius: 8px;
+            font-size: 18px;
+            border-radius: 50%;
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
@@ -286,19 +281,19 @@
             display: block;
         }
 
-        /* 侧边面板 */
+        /* 侧边面板 - 现代抽屉设计 */
         .toc-panel, .bookshelf-panel {
             position: fixed;
             top: 0;
-            left: -300px;
-            width: 300px;
+            left: -320px;
+            width: 320px;
             height: 100%;
-            background: white;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            transition: left 0.3s;
+            background: #ffffff;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             overflow-y: auto;
-            /* 安全区域适配 - 只保留顶部 */
+            /* 安全区域适配 */
             padding-top: env(safe-area-inset-top);
         }
 
@@ -307,60 +302,118 @@
         }
 
         .toc-header, .bookshelf-header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
+            background: #f8f9fa;
+            color: #333333;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e5ea;
         }
 
         .toc-close, .bookshelf-close {
             background: none;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            color: #007aff;
+            font-size: 24px;
             cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
         }
 
-        /* 操作说明框 */
+        .toc-close:hover, .bookshelf-close:hover {
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        /* 操作说明框 - 现代卡片设计 */
         .instruction-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-            max-width: 500px;
+            margin-top: 32px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
         }
 
         .instruction-box h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            font-size: 16px;
+            margin-bottom: 16px;
+            color: #333333;
+            font-size: 18px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .instruction-box p {
-            margin-bottom: 10px;
-            font-size: 13px;
+            margin-bottom: 12px;
+            font-size: 14px;
             line-height: 1.6;
-            color: #555;
+            color: #666666;
         }
 
         .instruction-box strong {
-            color: #2c3e50;
+            color: #333333;
+            font-weight: 600;
+        }
+
+        /* 阅读内容样式 */
+        .reading-content {
+            padding: 20px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .reading-content h2 {
+            color: #007aff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .reading-content p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .page-info {
+            text-align: center;
+            margin-top: 30px;
+            color: #8e8e93;
+            font-size: 14px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .reading-content {
+                padding: 16px;
+                font-size: 15px;
+            }
+            
+            .instruction-box {
+                margin: 24px 16px;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 顶部工具栏 -->
+    <!-- 顶部导航栏 -->
     <div class="header">
         <div class="controls">
-            <button id="bookshelfBtn" class="btn">书架</button>
-            <button id="updateBtn" class="btn">更新</button>
+            <button id="bookshelfBtn" class="btn">📚 书架</button>
+            <button id="updateBtn" class="btn">🔄 更新</button>
         </div>
     </div>
 
@@ -368,15 +421,12 @@
     <div class="main-content">
         <!-- 欢迎页面 -->
         <div id="welcome" class="welcome">
-            <h2>应用界面</h2>
-            <p>这是一个干净的UI框架</p>
-            <p style="margin-top: 20px; font-size: 14px; color: #3498db;">
-                💡 支持触摸操作，享受沉浸式体验
-            </p>
+            <h2>📖 智能阅读</h2>
+            <p>享受沉浸式的阅读体验</p>
             <div class="instruction-box">
-                <h3>📱 操作说明</h3>
+                <h3>📱 操作指南</h3>
                 <p><strong>触摸操作：</strong></p>
-                <p>• 左右滑动 → 切换页面（全屏区域）</p>
+                <p>• 左右滑动 → 切换页面</p>
                 <p>• 点击屏幕中间 → 显示/隐藏工具栏</p>
                 <p>• 点击屏幕左侧 → 上一页</p>
                 <p>• 点击屏幕右侧 → 下一页</p>
@@ -390,12 +440,7 @@
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
                 <div id="viewer">
-                    <!-- 示例内容区域 -->
-                    <div style="text-align: center; color: #666;">
-                        <h3>内容显示区域</h3>
-                        <p>这里可以显示任何内容</p>
-                        <p>支持全屏显示和触摸操作</p>
-                    </div>
+                    <!-- 阅读内容将通过JavaScript动态生成 -->
                 </div>
                 <!-- 触摸层 -->
                 <div id="touchLayer" class="touch-layer">
@@ -410,13 +455,23 @@
         </div>
     </div>
     
-    <!-- 底部工具栏 -->
+    <!-- 底部标签栏 -->
     <div class="footer">
-        <div class="footer-controls">
-            <button id="tocBtn" class="btn">目录</button>
-            <button id="prevBtn" class="btn">‹ 上一页</button>
-            <span id="pageNumber" class="page-number">1</span>
-            <button id="nextBtn" class="btn">下一页 ›</button>
+        <div class="footer-btn" id="tocBtn">
+            <div class="footer-btn-icon">📋</div>
+            <span>目录</span>
+        </div>
+        <div class="footer-btn" id="prevBtn">
+            <div class="footer-btn-icon">‹</div>
+            <span>上一页</span>
+        </div>
+        <div class="footer-btn" id="pageNumber">
+            <div class="footer-btn-icon">1</div>
+            <span>页码</span>
+        </div>
+        <div class="footer-btn" id="nextBtn">
+            <div class="footer-btn-icon">›</div>
+            <span>下一页</span>
         </div>
     </div>
 
@@ -426,7 +481,7 @@
     <!-- 目录面板 -->
     <div id="tocPanel" class="toc-panel">
         <div class="toc-header">
-            <h3>目录</h3>
+            <h3>📋 目录</h3>
             <button class="toc-close" id="tocClose">&times;</button>
         </div>
     </div>
@@ -434,7 +489,7 @@
     <!-- 书架面板 -->
     <div id="bookshelfPanel" class="bookshelf-panel">
         <div class="bookshelf-header">
-            <h3>书架</h3>
+            <h3>📚 书架</h3>
             <button class="bookshelf-close" id="bookshelfClose">&times;</button>
         </div>
     </div>
@@ -512,7 +567,10 @@
             }
 
             updatePageNumber() {
-                this.pageNumber.textContent = this.currentPage;
+                this.pageNumber.innerHTML = `
+                    <div class="footer-btn-icon">${this.currentPage}</div>
+                    <span>页码</span>
+                `;
                 this.updatePageContent();
             }
 
@@ -555,12 +613,12 @@
             updatePageContent() {
                 const content = this.bookContent[this.currentPage - 1];
                 this.viewer.innerHTML = `
-                    <div style="padding: 20px; line-height: 1.8; font-size: 16px; color: #333;">
-                        <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">第${this.currentPage}页</h2>
-                        <div style="text-align: justify;">
+                    <div class="reading-content">
+                        <h2>第${this.currentPage}页</h2>
+                        <div>
                             ${content}
                         </div>
-                        <div style="text-align: center; margin-top: 30px; color: #7f8c8d; font-size: 14px;">
+                        <div class="page-info">
                             ${this.currentPage} / ${this.totalPages}
                         </div>
                     </div>
