@@ -36,12 +36,6 @@
             width: 100vw;
             height: 100vh;
             overflow: auto;
-            /* PWA模式下的特殊处理 */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
         }
 
         .header {
@@ -52,18 +46,14 @@
             background: rgba(44, 62, 80, 0.95);
             color: white;
             padding: 10px 15px;
-            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            min-height: calc(50px + env(safe-area-inset-top));
+            min-height: 50px;
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
-            /* 延伸到状态栏，完全覆盖 */
-            margin-top: calc(-1 * env(safe-area-inset-top));
-            padding-top: calc(10px + env(safe-area-inset-top));
         }
         
         .header.hidden {
@@ -78,18 +68,14 @@
             background: rgba(44, 62, 80, 0.95);
             color: white;
             padding: 10px 15px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            min-height: calc(50px + env(safe-area-inset-bottom));
+            min-height: 50px;
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
-            /* 延伸到底部安全区域，完全覆盖 */
-            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
         
         .footer.hidden {
@@ -141,12 +127,6 @@
             /* 确保完全填充屏幕 */
             margin: 0;
             padding: 0;
-            /* PWA模式下的特殊处理 */
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
         }
 
         .welcome {
@@ -194,8 +174,8 @@
             border: none;
             user-select: none;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top));
-            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            padding-top: 60px;
+            padding-bottom: 60px;
             /* 添加边框 */
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -237,8 +217,8 @@
             height: 100%;
             pointer-events: auto;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top));
-            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            padding-top: 60px;
+            padding-bottom: 60px;
             touch-action: auto;
         }
 
@@ -274,13 +254,23 @@
                 overflow: auto;
             }
             
-            /* PWA模式下减少底部空间占用 */
+            /* PWA模式下正确的位置处理 */
+            .header {
+                top: env(safe-area-inset-top);
+            }
+            
+            .footer {
+                bottom: env(safe-area-inset-bottom);
+            }
+            
             #viewer {
-                padding-bottom: calc(60px + env(safe-area-inset-bottom) * 0.5);
+                padding-top: calc(60px + env(safe-area-inset-top));
+                padding-bottom: calc(60px + env(safe-area-inset-bottom));
             }
             
             .touch-area {
-                padding-bottom: calc(60px + env(safe-area-inset-bottom) * 0.5);
+                padding-top: calc(60px + env(safe-area-inset-top));
+                padding-bottom: calc(60px + env(safe-area-inset-bottom));
             }
         }
         
@@ -330,7 +320,7 @@
         .overlay.show {
             display: block;
         }
-
+        
         .toc-panel {
             position: fixed;
             top: 0;
@@ -433,7 +423,7 @@
                 </div>
             </div>
         </div>
-
+        
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
                 <div id="viewer">
@@ -457,8 +447,8 @@
                 <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
                 <div id="pageIndicatorRight" class="page-indicator right">›</div>
             </div>
-        </div>
-        
+            </div>
+            
         <!-- 底部工具栏 -->
         <div class="footer">
             <div class="footer-controls">
@@ -504,7 +494,7 @@
                 this.welcome = document.getElementById('welcome');
                 this.readerContainer = document.getElementById('readerContainer');
                 this.viewer = document.getElementById('viewer');
-
+                
                 // 按钮
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
