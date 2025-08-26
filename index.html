@@ -152,6 +152,21 @@
             padding: 0 !important;
         }
         
+        /* 优化EPUB内容显示 */
+        .viewer iframe body {
+            margin: 0 !important;
+            padding: 20px !important;
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+            max-width: none !important;
+        }
+        
+        /* 确保EPUB内容充分利用屏幕宽度 */
+        .viewer iframe * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
         /* 触摸层样式 */
         .touch-layer {
             position: absolute;
@@ -982,7 +997,7 @@
                     this.rendition = this.book.renderTo(this.viewer, {
                         width: '100%',
                         height: '100%',
-                        flow: 'paginated',
+                        flow: 'scrolled',
                         allowScriptedContent: true,
                         allowPopups: true
                     });
@@ -1464,7 +1479,7 @@
                     this.rendition = this.book.renderTo(this.viewer, {
                         width: '100%',
                         height: '100%',
-                        flow: 'paginated',
+                        flow: 'scrolled',
                         allowScriptedContent: true,
                         allowPopups: true
                     });
