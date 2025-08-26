@@ -48,6 +48,12 @@
             width: 100vw;
             height: 100vh;
             overflow: auto;
+            /* PWA模式下的特殊处理 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
         .header {
@@ -202,6 +208,8 @@
             border-radius: 5px;
             font-size: 12px;
             font-family: monospace;
+            /* PWA模式下也显示调试面板 */
+            display: block;
         }
 
         .debug-mode button {
@@ -231,6 +239,12 @@
         .debug-border.debug-active::before,
         .debug-border.debug-active::after {
             display: block;
+        }
+
+        /* 确保PWA模式下调试边框也能显示 */
+        .debug-border.debug-active::before,
+        .debug-border.debug-active::after {
+            display: block !important;
         }
 
         .debug-border::before {
@@ -324,6 +338,30 @@
             border-color: rgba(52, 73, 94, 0.6) !important;
         }
         
+        /* PWA模式特殊处理 */
+        @media (display-mode: standalone) {
+            body {
+                /* 防止PWA模式下的滚动问题 */
+                overflow: hidden;
+            }
+            
+            .main-content {
+                /* 确保PWA模式下内容正确显示 */
+                overflow: hidden;
+            }
+            
+            .viewer {
+                /* PWA模式下的阅读器特殊处理 */
+                overflow: auto;
+            }
+            
+            /* 确保调试面板在PWA模式下可见 */
+            .debug-mode {
+                display: block !important;
+                z-index: 10000;
+            }
+        }
+        
         /* 翻页提示指示器 */
         .page-indicator {
             position: absolute;
@@ -400,6 +438,12 @@
             /* 确保完全填充屏幕 */
             margin: 0;
             padding: 0;
+            /* PWA模式下的特殊处理 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
         .loading {
@@ -792,6 +836,7 @@
         <div id="debugPanel" class="debug-mode">
             <span>调试模式</span>
             <button id="toggleDebug">开启</button>
+            <button id="pwaInfo" style="margin-left: 5px; background: #3498db;">PWA信息</button>
         </div>
 
         <div class="header debug-border debug-header" data-debug-name="Header">
@@ -2202,6 +2247,12 @@
         // 调试模式控制
         let debugMode = false;
         
+        // 检测是否在PWA模式下运行
+        function isPWA() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+        
         function toggleDebugMode() {
             debugMode = !debugMode;
             const debugPanel = document.getElementById('debugPanel');
@@ -2214,13 +2265,52 @@
                     el.classList.add('debug-active');
                 });
                 console.log('🔍 调试模式已开启');
+                
+                // 显示PWA状态信息
+                const pwaStatus = isPWA() ? 'PWA模式' : '浏览器模式';
+                console.log(`📱 当前运行模式: ${pwaStatus}`);
+                
+                // 更新调试面板显示
+                const statusSpan = debugPanel.querySelector('span');
+                if (statusSpan) {
+                    statusSpan.textContent = `调试模式 (${pwaStatus})`;
+                }
             } else {
                 toggleBtn.textContent = '开启';
                 debugElements.forEach(el => {
                     el.classList.remove('debug-active');
                 });
                 console.log('🔍 调试模式已关闭');
+                
+                // 恢复原始文本
+                const statusSpan = debugPanel.querySelector('span');
+                if (statusSpan) {
+                    statusSpan.textContent = '调试模式';
+                }
             }
+        }
+        
+        // 显示PWA详细信息
+        function showPWAInfo() {
+            const pwaStatus = isPWA() ? 'PWA模式' : '浏览器模式';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const screenWidth = screen.width;
+            const screenHeight = screen.height;
+            
+            console.log('📱 PWA详细信息:');
+            console.log(`运行模式: ${pwaStatus}`);
+            console.log(`视口尺寸: ${viewportWidth} x ${viewportHeight}`);
+            console.log(`屏幕尺寸: ${screenWidth} x ${screenHeight}`);
+            console.log(`设备像素比: ${window.devicePixelRatio}`);
+            console.log(`用户代理: ${navigator.userAgent}`);
+            
+            // 显示安全区域信息
+            const safeAreaTop = getComputedStyle(document.documentElement).getPropertyValue('--sat') || '0px';
+            const safeAreaBottom = getComputedStyle(document.documentElement).getPropertyValue('--sab') || '0px';
+            console.log(`安全区域: 顶部 ${safeAreaTop}, 底部 ${safeAreaBottom}`);
+            
+            alert(`PWA信息:\n运行模式: ${pwaStatus}\n视口: ${viewportWidth}x${viewportHeight}\n屏幕: ${screenWidth}x${screenHeight}\n像素比: ${window.devicePixelRatio}`);
         }
         
         // 初始化调试模式
@@ -2231,6 +2321,20 @@
             });
             
             document.getElementById('toggleDebug').addEventListener('click', toggleDebugMode);
+            document.getElementById('pwaInfo').addEventListener('click', showPWAInfo);
+            
+            // 页面加载时显示PWA状态
+            const pwaStatus = isPWA() ? 'PWA模式' : '浏览器模式';
+            console.log(`📱 应用启动模式: ${pwaStatus}`);
+            
+            // 显示视口信息
+            console.log(`📐 视口尺寸: ${window.innerWidth} x ${window.innerHeight}`);
+            console.log(`📐 屏幕尺寸: ${screen.width} x ${screen.height}`);
+            
+            // 显示安全区域信息
+            const safeAreaTop = getComputedStyle(document.documentElement).getPropertyValue('--sat') || '0px';
+            const safeAreaBottom = getComputedStyle(document.documentElement).getPropertyValue('--sab') || '0px';
+            console.log(`🛡️ 安全区域: 顶部 ${safeAreaTop}, 底部 ${safeAreaBottom}`);
         }
 
         // 初始化阅读器
