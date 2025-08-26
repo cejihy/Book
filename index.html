@@ -152,21 +152,6 @@
             padding: 0 !important;
         }
         
-        /* 优化EPUB内容显示 */
-        .viewer iframe body {
-            margin: 0 !important;
-            padding: 20px !important;
-            font-size: 16px !important;
-            line-height: 1.6 !important;
-            max-width: none !important;
-        }
-        
-        /* 确保EPUB内容充分利用屏幕宽度 */
-        .viewer iframe * {
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
-        
         /* 触摸层样式 */
         .touch-layer {
             position: absolute;
@@ -177,6 +162,116 @@
             z-index: 10;
             pointer-events: none; /* 默认不接收事件 */
             background: transparent;
+        }
+
+        /* 调试模式样式 */
+        .debug-mode {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .debug-mode button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .debug-mode button:hover {
+            background: #c0392b;
+        }
+
+        /* 调试边框样式 */
+        .debug-border {
+            position: relative;
+        }
+
+        .debug-border::before,
+        .debug-border::after {
+            display: none;
+        }
+
+        .debug-border.debug-active::before,
+        .debug-border.debug-active::after {
+            display: block;
+        }
+
+        .debug-border::before {
+            content: attr(data-debug-name);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-family: monospace;
+            z-index: 10000;
+            border-radius: 0 0 3px 0;
+        }
+
+        .debug-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid rgba(255, 0, 0, 0.6);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 不同区域的调试颜色 */
+        .debug-header::before {
+            background: rgba(52, 152, 219, 0.8) !important;
+        }
+
+        .debug-header::after {
+            border-color: rgba(52, 152, 219, 0.6) !important;
+        }
+
+        .debug-footer::before {
+            background: rgba(46, 204, 113, 0.8) !important;
+        }
+
+        .debug-footer::after {
+            border-color: rgba(46, 204, 113, 0.6) !important;
+        }
+
+        .debug-viewer::before {
+            background: rgba(155, 89, 182, 0.8) !important;
+        }
+
+        .debug-viewer::after {
+            border-color: rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .debug-touch::before {
+            background: rgba(241, 196, 15, 0.8) !important;
+        }
+
+        .debug-touch::after {
+            border-color: rgba(241, 196, 15, 0.6) !important;
+        }
+
+        .debug-touch-area::before {
+            background: rgba(230, 126, 34, 0.8) !important;
+        }
+
+        .debug-touch-area::after {
+            border-color: rgba(230, 126, 34, 0.6) !important;
         }
         
         /* 触摸区域样式 */
@@ -669,7 +764,13 @@
     </style>
 </head>
 <body>
-    <div class="header">
+    <!-- 调试控制面板 -->
+    <div id="debugPanel" class="debug-mode">
+        <span>调试模式</span>
+        <button id="toggleDebug">开启</button>
+    </div>
+
+    <div class="header debug-border debug-header" data-debug-name="Header">
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
             <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
@@ -705,17 +806,17 @@
 
 
         
-        <div id="readerContainer" class="reader-container">
-            <div class="viewer">
-                <div id="viewer"></div>
+        <div id="readerContainer" class="reader-container debug-border debug-viewer" data-debug-name="ReaderContainer">
+            <div class="viewer debug-border debug-viewer" data-debug-name="Viewer">
+                <div id="viewer" class="debug-border debug-viewer" data-debug-name="ViewerContent"></div>
                 <!-- 触摸层 -->
-                <div id="touchLayer" class="touch-layer">
+                <div id="touchLayer" class="touch-layer debug-border debug-touch" data-debug-name="TouchLayer">
                     <!-- 左侧翻页区域 -->
-                    <div id="leftTouchArea" class="touch-area left"></div>
+                    <div id="leftTouchArea" class="touch-area left debug-border debug-touch-area" data-debug-name="LeftTouch"></div>
                     <!-- 中间控制区域 -->
-                    <div id="centerTouchArea" class="touch-area center"></div>
+                    <div id="centerTouchArea" class="touch-area center debug-border debug-touch-area" data-debug-name="CenterTouch"></div>
                     <!-- 右侧翻页区域 -->
-                    <div id="rightTouchArea" class="touch-area right"></div>
+                    <div id="rightTouchArea" class="touch-area right debug-border debug-touch-area" data-debug-name="RightTouch"></div>
                 </div>
                 <!-- 翻页指示器 -->
                 <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
@@ -724,7 +825,7 @@
         </div>
         
         <!-- 底部工具栏 -->
-        <div class="footer">
+        <div class="footer debug-border debug-footer" data-debug-name="Footer">
             <div class="footer-controls">
                 <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
                 <button id="prevBtn" class="btn">‹ 上一页</button>
@@ -997,7 +1098,7 @@
                     this.rendition = this.book.renderTo(this.viewer, {
                         width: '100%',
                         height: '100%',
-                        flow: 'scrolled',
+                        flow: 'paginated',
                         allowScriptedContent: true,
                         allowPopups: true
                     });
@@ -1479,7 +1580,7 @@
                     this.rendition = this.book.renderTo(this.viewer, {
                         width: '100%',
                         height: '100%',
-                        flow: 'scrolled',
+                        flow: 'paginated',
                         allowScriptedContent: true,
                         allowPopups: true
                     });
@@ -2074,9 +2175,44 @@
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
+        // 调试模式控制
+        let debugMode = false;
+        
+        function toggleDebugMode() {
+            debugMode = !debugMode;
+            const debugPanel = document.getElementById('debugPanel');
+            const toggleBtn = document.getElementById('toggleDebug');
+            const debugElements = document.querySelectorAll('.debug-border');
+            
+            if (debugMode) {
+                toggleBtn.textContent = '关闭';
+                debugElements.forEach(el => {
+                    el.classList.add('debug-active');
+                });
+                console.log('🔍 调试模式已开启');
+            } else {
+                toggleBtn.textContent = '开启';
+                debugElements.forEach(el => {
+                    el.classList.remove('debug-active');
+                });
+                console.log('🔍 调试模式已关闭');
+            }
+        }
+        
+        // 初始化调试模式
+        function initDebugMode() {
+            const debugElements = document.querySelectorAll('.debug-border');
+            debugElements.forEach(el => {
+                el.classList.remove('debug-active');
+            });
+            
+            document.getElementById('toggleDebug').addEventListener('click', toggleDebugMode);
+        }
+
         // 初始化阅读器
         document.addEventListener('DOMContentLoaded', () => {
             new EpubReader();
+            initDebugMode();
             
             // 注册Service Worker
             if ('serviceWorker' in navigator) {
