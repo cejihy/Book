@@ -56,6 +56,19 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             min-height: 50px;
         }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            min-height: 50px;
+            flex-shrink: 0; /* 防止被压缩 */
+        }
 
 
 
@@ -83,9 +96,14 @@
             margin: 0 8px;
         }
         
+        .footer-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
         /* 阅读器容器布局 */
         .reader-container {
-            padding-bottom: 0;
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -114,10 +132,11 @@
         .touch-area {
             position: absolute;
             top: 0;
-            height: 100%;
+            height: calc(100% - 50px); /* 默认减去底部工具栏高度 */
             z-index: 10;
             pointer-events: auto;
             background: transparent;
+            transition: height 0.3s ease;
         }
         
         .touch-area.left {
@@ -253,7 +272,6 @@
             position: relative;
             user-select: none;
             min-height: 0;
-            /* 移除指针样式，因为不再需要点击翻页 */
         }
 
         /* 移除翻页区域指示器和调试区域样式 */
@@ -595,13 +613,7 @@
     <div class="header">
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
-            <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
-            <button id="prevBtn" class="btn">‹ 上一页</button>
-            <span id="pageNumber" class="page-number">4</span>
-            <button id="nextBtn" class="btn">下一页 ›</button>
             <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
-            <!-- 移除调试按钮 -->
-            <!-- <button id="debugBtn" class="btn" style="background: #f39c12;">🐛 调试</button> -->
         </div>
     </div>
 
@@ -647,6 +659,16 @@
                 <!-- 翻页指示器 -->
                 <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
                 <div id="pageIndicatorRight" class="page-indicator right">›</div>
+            </div>
+        </div>
+        
+        <!-- 底部工具栏 -->
+        <div class="footer">
+            <div class="footer-controls">
+                <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+                <button id="prevBtn" class="btn">‹ 上一页</button>
+                <span id="pageNumber" class="page-number">4</span>
+                <button id="nextBtn" class="btn">下一页 ›</button>
             </div>
         </div>
     </div>
@@ -1719,6 +1741,7 @@
         class TouchLayer {
             constructor(reader) {
                 this.reader = reader;
+                this.mainHammer = null;
                 this.leftHammer = null;
                 this.centerHammer = null;
                 this.rightHammer = null;
@@ -1728,42 +1751,56 @@
             }
             
             init() {
-                // 初始化左侧区域（翻页）
+                // 创建整个触摸层的Hammer实例（用于滑动）
+                if (this.reader.touchLayerElement) {
+                    this.mainHammer = new Hammer(this.reader.touchLayerElement);
+                    this.mainHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+                    this.mainHammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
+                    this.mainHammer.on('swiperight', (e) => this.handleSwipeRight(e));
+                }
+                
+                // 初始化左侧区域（点击翻页）
                 if (this.reader.leftTouchArea) {
                     this.leftHammer = new Hammer(this.reader.leftTouchArea);
-                    this.leftHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
                     this.leftHammer.get('tap').set({ time: 300 });
-                    this.leftHammer.on('swiperight', (e) => this.handleLeftSwipe(e));
                     this.leftHammer.on('tap', (e) => this.handleLeftTap(e));
                 }
                 
-                // 初始化中间区域（控制栏）
+                // 初始化中间区域（点击控制栏）
                 if (this.reader.centerTouchArea) {
                     this.centerHammer = new Hammer(this.reader.centerTouchArea);
                     this.centerHammer.get('tap').set({ time: 300 });
                     this.centerHammer.on('tap', (e) => this.handleCenterTap(e));
                 }
                 
-                // 初始化右侧区域（翻页）
+                // 初始化右侧区域（点击翻页）
                 if (this.reader.rightTouchArea) {
                     this.rightHammer = new Hammer(this.reader.rightTouchArea);
-                    this.rightHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
                     this.rightHammer.get('tap').set({ time: 300 });
-                    this.rightHammer.on('swipeleft', (e) => this.handleRightSwipe(e));
                     this.rightHammer.on('tap', (e) => this.handleRightTap(e));
                 }
             }
             
 
             
-            // 左侧区域处理方法
-            handleLeftSwipe(e) {
+            // 全局滑动处理方法
+            handleSwipeLeft(e) {
                 if (!this.isEnabled) return;
                 
-                console.log('左侧区域向右滑动 - 上一页', e);
+                console.log('向左滑动 - 下一页', e);
+                this.showPageIndicator('right');
+                this.reader.nextPage();
+            }
+            
+            handleSwipeRight(e) {
+                if (!this.isEnabled) return;
+                
+                console.log('向右滑动 - 上一页', e);
                 this.showPageIndicator('left');
                 this.reader.prevPage();
             }
+            
+            // 左侧区域处理方法
             
             handleLeftTap(e) {
                 if (!this.isEnabled) return;
@@ -1781,14 +1818,7 @@
                 this.toggleControls();
             }
             
-            // 右侧区域处理方法
-            handleRightSwipe(e) {
-                if (!this.isEnabled) return;
-                
-                console.log('右侧区域向左滑动 - 下一页', e);
-                this.showPageIndicator('right');
-                this.reader.nextPage();
-            }
+
             
             handleRightTap(e) {
                 if (!this.isEnabled) return;
@@ -1825,9 +1855,19 @@
             toggleControls() {
                 // 切换控制栏显示状态
                 const header = document.querySelector('.header');
-                if (header) {
+                const footer = document.querySelector('.footer');
+                const touchAreas = document.querySelectorAll('.touch-area');
+                
+                if (header && footer) {
                     const isVisible = header.style.display !== 'none';
-                    header.style.display = isVisible ? 'none' : 'flex';
+                    const newDisplay = isVisible ? 'none' : 'flex';
+                    header.style.display = newDisplay;
+                    footer.style.display = newDisplay;
+                    
+                    // 调整触摸区域高度
+                    touchAreas.forEach(area => {
+                        area.style.height = isVisible ? '100%' : 'calc(100% - 50px)';
+                    });
                 }
             }
             
@@ -1840,6 +1880,10 @@
             }
             
             destroy() {
+                if (this.mainHammer) {
+                    this.mainHammer.destroy();
+                    this.mainHammer = null;
+                }
                 if (this.leftHammer) {
                     this.leftHammer.destroy();
                     this.leftHammer = null;
