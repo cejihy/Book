@@ -35,6 +35,47 @@
             /* 状态栏一体化设计 */
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
+            /* 隐藏底部额外栏 */
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        /* 隐藏Home Indicator和系统导航栏 */
+        @supports (padding: max(0px)) {
+            body {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* PWA全屏模式 - 隐藏所有系统UI */
+        @media (display-mode: standalone) {
+            body {
+                padding-bottom: 0;
+            }
+            
+            .footer {
+                bottom: 0;
+                padding-bottom: 0;
+            }
+        }
+
+        /* 强制隐藏底部额外栏 */
+        @media screen and (max-height: 800px) {
+            body {
+                padding-bottom: 0 !important;
+            }
+            
+            .footer {
+                bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+        }
+
+        /* 隐藏可能的系统导航栏 */
+        @media (orientation: portrait) {
+            body {
+                padding-bottom: 0;
+            }
         }
 
         /* 顶部导航栏 - 状态栏一体化设计 */
@@ -816,6 +857,34 @@
         // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
             new AppUI();
+            
+            // 检测并处理底部额外栏
+            function handleBottomBar() {
+                const footer = document.querySelector('.footer');
+                const body = document.body;
+                
+                // 强制设置底部位置
+                footer.style.bottom = '0px';
+                footer.style.paddingBottom = '0px';
+                footer.style.marginBottom = '0px';
+                
+                // 移除body的底部padding
+                body.style.paddingBottom = '0px';
+                body.style.marginBottom = '0px';
+                
+                console.log('底部栏处理完成');
+            }
+            
+            // 立即执行
+            handleBottomBar();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', handleBottomBar);
+            
+            // 监听方向变化
+            window.addEventListener('orientationchange', () => {
+                setTimeout(handleBottomBar, 100);
+            });
         });
     </script>
 </body>
