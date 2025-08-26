@@ -61,9 +61,9 @@
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
-            /* 确保完全延伸到状态栏 */
-            margin-top: calc(-1 * env(safe-area-inset-top));
-            padding-top: calc(10px + env(safe-area-inset-top) * 2);
+            /* 不延伸到状态栏，保持状态栏透明 */
+            margin-top: 0;
+            padding-top: calc(10px + env(safe-area-inset-top));
         }
         
         .header.hidden {
@@ -87,9 +87,9 @@
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
-            /* 确保完全延伸到底部 */
-            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
-            padding-bottom: calc(10px + env(safe-area-inset-bottom) * 2);
+            /* 不延伸到底部安全区域，保持底部透明 */
+            margin-bottom: 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
         
         .footer.hidden {
@@ -203,12 +203,10 @@
         
         .page-indicator.left {
             left: 20px;
-            top: calc(50% + env(safe-area-inset-top));
         }
         
         .page-indicator.right {
             right: 20px;
-            top: calc(50% + env(safe-area-inset-top));
         }
         
         .page-indicator.show {
@@ -304,8 +302,8 @@
             background: white;
             user-select: none;
             /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top) * 2);
-            padding-bottom: calc(50px + env(safe-area-inset-bottom) * 2);
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(50px + env(safe-area-inset-bottom));
             overflow: auto;
         }
 
