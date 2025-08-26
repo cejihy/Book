@@ -33,12 +33,11 @@
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
-            /* 标准PWA布局 - 参考微信设计 */
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
 
-        /* 顶部状态栏 - 微信风格 */
+        /* 顶部状态栏 */
         .status-bar {
             position: fixed;
             top: 0;
@@ -54,7 +53,7 @@
             transform: translateY(-100%);
         }
 
-        /* 顶部导航栏 - 微信风格 */
+        /* 顶部导航栏 */
         .header {
             position: fixed;
             top: env(safe-area-inset-top);
@@ -76,7 +75,7 @@
             transform: translateY(-100%);
         }
         
-        /* 底部标签栏 - 成熟应用标准 */
+        /* 底部标签栏 */
         .footer {
             position: fixed;
             bottom: 0;
@@ -90,7 +89,6 @@
             align-items: center;
             box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
             z-index: 1000;
-            /* 成熟应用标准 - 完全覆盖Home Indicator */
             padding-bottom: env(safe-area-inset-bottom);
             min-height: calc(49px + env(safe-area-inset-bottom));
         }
@@ -99,7 +97,7 @@
             transform: translateY(100%);
         }
 
-        /* 按钮样式 - 微信风格 */
+        /* 按钮样式 */
         .btn {
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -120,7 +118,7 @@
             transform: scale(0.95);
         }
 
-        /* 底部导航按钮 - 微信风格 */
+        /* 底部导航按钮 */
         .footer-btn {
             display: flex;
             flex-direction: column;
@@ -142,18 +140,17 @@
             margin-bottom: 2px;
         }
 
-        /* 主内容区域 - 成熟应用标准 */
+        /* 主内容区域 */
         .main-content {
             position: relative;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            /* 成熟应用标准 - 内容直接延伸到Footer */
             padding-top: calc(44px + env(safe-area-inset-top));
             padding-bottom: 0;
         }
 
-        /* 欢迎页面 - 微信风格 */
+        /* 欢迎页面 */
         .welcome {
             text-align: center;
             padding: 32px 20px;
@@ -193,7 +190,7 @@
             display: block !important;
         }
 
-        /* 内容查看器 - 微信风格 */
+        /* 内容查看器 */
         .viewer {
             position: relative;
             width: 100%;
@@ -242,7 +239,7 @@
             right: 0;
         }
 
-        /* 翻页指示器 - 微信风格 */
+        /* 翻页指示器 */
         .page-indicator {
             position: absolute;
             top: 50%;
@@ -289,8 +286,8 @@
         .overlay.show {
             display: block;
         }
-        
-        /* 侧边面板 - 微信风格 */
+
+        /* 侧边面板 */
         .toc-panel, .bookshelf-panel {
             position: fixed;
             top: 0;
@@ -302,7 +299,6 @@
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             overflow-y: auto;
-            /* 微信风格安全区域 - 覆盖Home Indicator */
             padding-top: calc(44px + env(safe-area-inset-top));
             padding-bottom: calc(49px + env(safe-area-inset-bottom));
         }
@@ -338,7 +334,7 @@
             background: rgba(0, 122, 255, 0.1);
         }
 
-        /* 操作说明框 - 微信风格 */
+        /* 操作说明框 */
         .instruction-box {
             margin-top: 32px;
             padding: 24px;
@@ -370,7 +366,7 @@
             font-weight: 600;
         }
 
-        /* 阅读内容样式 - 微信风格 */
+        /* 阅读内容样式 */
         .reading-content {
             padding: 20px;
             line-height: 1.8;
@@ -481,8 +477,8 @@
                 <div id="pageIndicatorRight" class="page-indicator right">›</div>
             </div>
         </div>
-            </div>
-            
+    </div>
+    
     <!-- 底部标签栏 -->
     <div class="footer">
         <div class="footer-btn" id="tocBtn">
@@ -541,7 +537,7 @@
                 this.welcome = document.getElementById('welcome');
                 this.readerContainer = document.getElementById('readerContainer');
                 this.viewer = document.getElementById('viewer');
-                
+
                 // 按钮
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
@@ -645,12 +641,12 @@
                         <h2>第${this.currentPage}页</h2>
                         <div>
                             ${content}
-                    </div>
+                        </div>
                         <div class="page-info">
                             ${this.currentPage} / ${this.totalPages}
-                            </div>
                         </div>
-                    `;
+                    </div>
+                `;
             }
 
             generateBookContent() {
@@ -843,33 +839,6 @@
         // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
             new AppUI();
-            
-            // 强制修复Footer位置 - 成熟应用标准
-            function fixFooterPosition() {
-                const footer = document.querySelector('.footer');
-                const mainContent = document.querySelector('.main-content');
-                
-                if (footer) {
-                    // 确保Footer完全覆盖Home Indicator
-                    footer.style.bottom = '0px';
-                    footer.style.paddingBottom = 'env(safe-area-inset-bottom)';
-                    footer.style.minHeight = 'calc(49px + env(safe-area-inset-bottom))';
-                    footer.style.zIndex = '1000';
-                }
-                
-                if (mainContent) {
-                    // 移除主内容区域的底部padding
-                    mainContent.style.paddingBottom = '0px';
-                }
-                
-                console.log('Footer位置已修复 - 成熟应用标准');
-            }
-            
-            // 立即执行
-            fixFooterPosition();
-            
-            // 监听窗口变化
-            window.addEventListener('resize', fixFooterPosition);
         });
     </script>
 </body>
