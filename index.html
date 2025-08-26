@@ -29,307 +29,243 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #000000;
+            background: #f8f9fa;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
-            color: #ffffff;
-            /* 全屏PWA设置 */
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            /* 标准PWA布局 - 参考微信设计 */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
-        /* 主容器 */
-        .app-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 状态栏区域 */
+        /* 顶部状态栏 - 微信风格 */
         .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             height: env(safe-area-inset-top);
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: #007AFF;
+            z-index: 10000;
         }
 
-        /* 顶部导航栏 */
+        /* 顶部导航栏 - 微信风格 */
         .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            padding: 16px 20px;
+            position: fixed;
+            top: env(safe-area-inset-top);
+            left: 0;
+            right: 0;
+            background: #007AFF;
+            color: #ffffff;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 44px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
+        
+        .header.hidden {
+            transform: translateY(-100%);
         }
-
-        .header-actions {
+        
+        /* 底部标签栏 - 微信风格 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            color: #666666;
+            padding: 8px 0;
             display: flex;
-            gap: 12px;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            min-height: 49px;
+            z-index: 1000;
+            /* 微信风格 - 紧贴底部 */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .footer.hidden {
+            transform: translateY(100%);
         }
 
-        /* 按钮样式 */
+        /* 按钮样式 - 微信风格 */
         .btn {
             background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            color: white;
             border: none;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
             font-weight: 500;
-            backdrop-filter: blur(10px);
         }
 
         .btn:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
         }
 
         .btn:active {
-            transform: translateY(0);
+            transform: scale(0.95);
         }
 
-        /* 主内容区域 */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        /* 欢迎页面 */
-        .welcome {
-            max-width: 400px;
-        }
-
-        .welcome-icon {
-            font-size: 80px;
-            margin-bottom: 24px;
-            opacity: 0.9;
-        }
-
-        .welcome-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(45deg, #ffffff, #e0e0e0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .welcome-subtitle {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        /* 功能卡片 */
-        .feature-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-top: 32px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-4px);
-        }
-
-        .feature-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .feature-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .feature-desc {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.4;
-        }
-
-        /* 阅读器界面 */
-        .reader {
-            display: none;
-            flex: 1;
-            background: #ffffff;
-            color: #333333;
-            position: relative;
-        }
-
-        .reader.active {
-            display: flex;
-        }
-
-        .reader-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            line-height: 1.8;
-            font-size: 16px;
-        }
-
-        .reader-content h2 {
-            color: #007AFF;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .reader-content p {
-            margin-bottom: 16px;
-            text-align: justify;
-        }
-
-        /* 底部导航栏 */
-        .footer {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item {
+        /* 底部导航按钮 - 微信风格 */
+        .footer-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            color: #8e8e93;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 10px;
             transition: color 0.2s ease;
             cursor: pointer;
         }
 
-        .nav-item.active {
-            color: #ffffff;
+        .footer-btn.active {
+            color: #007AFF;
         }
 
-        .nav-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
+        .footer-btn-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
         }
 
-        /* 触摸区域 */
-        .touch-areas {
+        /* 主内容区域 - 微信风格 */
+        .main-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* 微信风格布局 */
+            padding-top: calc(44px + env(safe-area-inset-top));
+            padding-bottom: calc(49px + env(safe-area-inset-bottom));
+        }
+
+        /* 欢迎页面 - 微信风格 */
+        .welcome {
+            text-align: center;
+            padding: 32px 20px;
+            color: #333333;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .welcome h2 {
+            margin-bottom: 16px;
+            color: #333333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .welcome p {
+            margin-bottom: 24px;
+            line-height: 1.6;
+            font-size: 16px;
+            color: #666666;
+        }
+
+        /* 阅读器容器 */
+        .reader-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background: #ffffff;
+        }
+        
+        .reader-container[style*="display: block"] {
+            display: block !important;
+        }
+
+        /* 内容查看器 - 微信风格 */
+        .viewer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 触摸层 */
+        .touch-layer {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
             pointer-events: none;
         }
-
+        
         .touch-area {
-            flex: 1;
+            position: absolute;
+            height: 100%;
             pointer-events: auto;
+            touch-action: auto;
         }
 
-        /* 页面指示器 */
+        .touch-area.left {
+            width: 30%;
+            left: 0;
+        }
+
+        .touch-area.center {
+            width: 40%;
+            left: 30%;
+        }
+
+        .touch-area.right {
+            width: 30%;
+            right: 0;
+        }
+
+        /* 翻页指示器 - 微信风格 */
         .page-indicator {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.8);
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             border-radius: 50%;
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            z-index: 20;
         }
-
+        
         .page-indicator.left {
             left: 20px;
         }
-
+        
         .page-indicator.right {
             right: 20px;
         }
-
+        
         .page-indicator.show {
             opacity: 1;
-        }
-
-        /* 侧边面板 */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100%;
-            background: #ffffff;
-            color: #333333;
-            transition: left 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .sidebar-header {
-            background: #007AFF;
-            color: #ffffff;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .sidebar-content {
-            padding: 20px;
         }
 
         /* 遮罩层 */
@@ -339,7 +275,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             z-index: 999;
             display: none;
         }
@@ -348,343 +284,390 @@
             display: block;
         }
 
+        /* 侧边面板 - 微信风格 */
+        .toc-panel, .bookshelf-panel {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+            /* 微信风格安全区域 */
+            padding-top: calc(44px + env(safe-area-inset-top));
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .toc-panel.open, .bookshelf-panel.open {
+            left: 0;
+        }
+
+        .toc-header, .bookshelf-header {
+            background: #f8f9fa;
+            color: #333333;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .toc-close, .bookshelf-close {
+            background: none;
+            border: none;
+            color: #007AFF;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .toc-close:hover, .bookshelf-close:hover {
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        /* 操作说明框 - 微信风格 */
+        .instruction-box {
+            margin-top: 32px;
+            padding: 24px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e5e5ea;
+            max-width: 400px;
+        }
+
+        .instruction-box h3 {
+            margin-bottom: 16px;
+            color: #333333;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-box p {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666666;
+        }
+
+        .instruction-box strong {
+            color: #333333;
+            font-weight: 600;
+        }
+
+        /* 阅读内容样式 - 微信风格 */
+        .reading-content {
+            padding: 20px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .reading-content h2 {
+            color: #007AFF;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .reading-content p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .page-info {
+            text-align: center;
+            margin-top: 30px;
+            color: #8e8e93;
+            font-size: 14px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
         /* 响应式设计 */
         @media (max-width: 480px) {
-            .welcome-title {
-                font-size: 28px;
+            .reading-content {
+                padding: 16px;
+                font-size: 15px;
             }
             
-            .feature-cards {
-                grid-template-columns: 1fr 1fr;
+            .instruction-box {
+                margin: 24px 16px;
+                padding: 20px;
             }
         }
 
         /* PWA全屏模式优化 */
         @media (display-mode: standalone) {
             body {
-                padding: 0;
+                height: 100vh;
+                height: 100dvh;
             }
             
             .status-bar {
-                height: 0;
+                background: #007AFF;
+            }
+            
+            .header {
+                background: #007AFF;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- 状态栏区域 -->
-        <div class="status-bar"></div>
-        
-        <!-- 顶部导航栏 -->
-        <div class="header">
-            <div class="header-title">智能阅读</div>
-            <div class="header-actions">
-                <button class="btn" id="bookshelfBtn">📚</button>
-                <button class="btn" id="settingsBtn">⚙️</button>
-            </div>
-        </div>
+    <!-- 顶部状态栏 -->
+    <div class="status-bar"></div>
 
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <!-- 欢迎页面 -->
-            <div class="welcome" id="welcome">
-                <div class="welcome-icon">📖</div>
-                <h1 class="welcome-title">智能阅读</h1>
-                <p class="welcome-subtitle">享受沉浸式的阅读体验，探索知识的无限可能</p>
-                
-                <div class="feature-cards">
-                    <div class="feature-card">
-                        <div class="feature-icon">📱</div>
-                        <div class="feature-title">全屏体验</div>
-                        <div class="feature-desc">沉浸式阅读，无干扰界面</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">👆</div>
-                        <div class="feature-title">手势操作</div>
-                        <div class="feature-desc">滑动翻页，点击控制</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🌙</div>
-                        <div class="feature-title">护眼模式</div>
-                        <div class="feature-desc">智能调节，保护视力</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <div class="feature-title">快速加载</div>
-                        <div class="feature-desc">秒开应用，流畅体验</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 阅读器界面 -->
-            <div class="reader" id="reader">
-                <div class="reader-content" id="readerContent">
-                    <!-- 阅读内容将通过JavaScript动态生成 -->
-                </div>
-                
-                <!-- 触摸区域 -->
-                <div class="touch-areas">
-                    <div class="touch-area" id="leftArea"></div>
-                    <div class="touch-area" id="centerArea"></div>
-                    <div class="touch-area" id="rightArea"></div>
-                </div>
-                
-                <!-- 页面指示器 -->
-                <div class="page-indicator left" id="leftIndicator">‹</div>
-                <div class="page-indicator right" id="rightIndicator">›</div>
-            </div>
-        </div>
-
-        <!-- 底部导航栏 -->
-        <div class="footer">
-            <div class="nav-item active" id="homeNav">
-                <div class="nav-icon">🏠</div>
-                <span>首页</span>
-            </div>
-            <div class="nav-item" id="libraryNav">
-                <div class="nav-icon">📚</div>
-                <span>书库</span>
-            </div>
-            <div class="nav-item" id="readingNav">
-                <div class="nav-icon">📖</div>
-                <span>阅读</span>
-            </div>
-            <div class="nav-item" id="profileNav">
-                <div class="nav-icon">👤</div>
-                <span>我的</span>
-            </div>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <div class="controls">
+            <button id="bookshelfBtn" class="btn">📚 书架</button>
+            <button id="updateBtn" class="btn">🔄 更新</button>
         </div>
     </div>
 
-    <!-- 侧边面板 -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3 id="sidebarTitle">菜单</h3>
-            <button class="sidebar-close" id="sidebarClose">&times;</button>
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <!-- 欢迎页面 -->
+        <div id="welcome" class="welcome">
+            <h2>📖 智能阅读</h2>
+            <p>享受沉浸式的阅读体验</p>
+            <div class="instruction-box">
+                <h3>📱 操作指南</h3>
+                <p><strong>触摸操作：</strong></p>
+                <p>• 左右滑动 → 切换页面</p>
+                <p>• 点击屏幕中间 → 显示/隐藏工具栏</p>
+                <p>• 点击屏幕左侧 → 上一页</p>
+                <p>• 点击屏幕右侧 → 下一页</p>
+                <p><strong>工具栏功能：</strong></p>
+                <p>• 顶部：书架管理、应用更新</p>
+                <p>• 底部：目录导航、翻页控制</p>
+            </div>
         </div>
-        <div class="sidebar-content" id="sidebarContent">
-            <!-- 侧边栏内容 -->
+
+        <!-- 阅读器容器 -->
+        <div id="readerContainer" class="reader-container">
+            <div class="viewer">
+                <div id="viewer">
+                    <!-- 阅读内容将通过JavaScript动态生成 -->
+                </div>
+                <!-- 触摸层 -->
+                <div id="touchLayer" class="touch-layer">
+                    <div id="leftTouchArea" class="touch-area left"></div>
+                    <div id="centerTouchArea" class="touch-area center"></div>
+                    <div id="rightTouchArea" class="touch-area right"></div>
+                </div>
+                <!-- 翻页指示器 -->
+                <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
+                <div id="pageIndicatorRight" class="page-indicator right">›</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部标签栏 -->
+    <div class="footer">
+        <div class="footer-btn" id="tocBtn">
+            <div class="footer-btn-icon">📋</div>
+            <span>目录</span>
+        </div>
+        <div class="footer-btn" id="prevBtn">
+            <div class="footer-btn-icon">‹</div>
+            <span>上一页</span>
+        </div>
+        <div class="footer-btn" id="pageNumber">
+            <div class="footer-btn-icon">1</div>
+            <span>页码</span>
+        </div>
+        <div class="footer-btn" id="nextBtn">
+            <div class="footer-btn-icon">›</div>
+            <span>下一页</span>
         </div>
     </div>
 
     <!-- 遮罩层 -->
-    <div class="overlay" id="overlay"></div>
+    <div id="overlay" class="overlay"></div>
+    
+    <!-- 目录面板 -->
+    <div id="tocPanel" class="toc-panel">
+        <div class="toc-header">
+            <h3>📋 目录</h3>
+            <button class="toc-close" id="tocClose">&times;</button>
+        </div>
+    </div>
+
+    <!-- 书架面板 -->
+    <div id="bookshelfPanel" class="bookshelf-panel">
+        <div class="bookshelf-header">
+            <h3>📚 书架</h3>
+            <button class="bookshelf-close" id="bookshelfClose">&times;</button>
+        </div>
+    </div>
 
     <script src="hammer.min.js"></script>
     <script>
-        class ModernPWA {
+        class AppUI {
             constructor() {
                 this.currentPage = 1;
                 this.totalPages = 20;
-                this.currentView = 'welcome';
+                this.isControlsVisible = true;
                 this.bookContent = this.generateBookContent();
                 
                 this.initElements();
                 this.bindEvents();
-                this.initTouchGestures();
-                this.setupPWA();
+                this.initTouchLayer();
+                this.showReader();
             }
 
             initElements() {
-                // 主要元素
                 this.welcome = document.getElementById('welcome');
-                this.reader = document.getElementById('reader');
-                this.readerContent = document.getElementById('readerContent');
-                
-                // 导航元素
-                this.homeNav = document.getElementById('homeNav');
-                this.libraryNav = document.getElementById('libraryNav');
-                this.readingNav = document.getElementById('readingNav');
-                this.profileNav = document.getElementById('profileNav');
-                
+                this.readerContainer = document.getElementById('readerContainer');
+                this.viewer = document.getElementById('viewer');
+
                 // 按钮
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.tocBtn = document.getElementById('tocBtn');
                 this.bookshelfBtn = document.getElementById('bookshelfBtn');
-                this.settingsBtn = document.getElementById('settingsBtn');
+                this.updateBtn = document.getElementById('updateBtn');
                 
-                // 侧边栏
-                this.sidebar = document.getElementById('sidebar');
-                this.sidebarClose = document.getElementById('sidebarClose');
-                this.sidebarTitle = document.getElementById('sidebarTitle');
-                this.sidebarContent = document.getElementById('sidebarContent');
+                // 翻页按钮和页码
+                this.pageNumber = document.getElementById('pageNumber');
+                
+                // 面板
+                this.tocPanel = document.getElementById('tocPanel');
+                this.tocClose = document.getElementById('tocClose');
+                this.bookshelfPanel = document.getElementById('bookshelfPanel');
+                this.bookshelfClose = document.getElementById('bookshelfClose');
                 this.overlay = document.getElementById('overlay');
                 
-                // 触摸区域
-                this.leftArea = document.getElementById('leftArea');
-                this.centerArea = document.getElementById('centerArea');
-                this.rightArea = document.getElementById('rightArea');
-                
-                // 指示器
-                this.leftIndicator = document.getElementById('leftIndicator');
-                this.rightIndicator = document.getElementById('rightIndicator');
+                // 触摸层元素
+                this.touchLayerElement = document.getElementById('touchLayer');
+                this.leftTouchArea = document.getElementById('leftTouchArea');
+                this.centerTouchArea = document.getElementById('centerTouchArea');
+                this.rightTouchArea = document.getElementById('rightTouchArea');
+                this.pageIndicatorLeft = document.getElementById('pageIndicatorLeft');
+                this.pageIndicatorRight = document.getElementById('pageIndicatorRight');
             }
 
             bindEvents() {
-                // 导航事件
-                this.homeNav.addEventListener('click', () => this.showView('welcome'));
-                this.libraryNav.addEventListener('click', () => this.showView('library'));
-                this.readingNav.addEventListener('click', () => this.showView('reader'));
-                this.profileNav.addEventListener('click', () => this.showView('profile'));
-                
-                // 按钮事件
-                this.bookshelfBtn.addEventListener('click', () => this.openSidebar('书架', this.generateBookshelfContent()));
-                this.settingsBtn.addEventListener('click', () => this.openSidebar('设置', this.generateSettingsContent()));
-                
-                // 侧边栏事件
-                this.sidebarClose.addEventListener('click', () => this.closeSidebar());
-                this.overlay.addEventListener('click', () => this.closeSidebar());
+                this.prevBtn.addEventListener('click', () => this.prevPage());
+                this.nextBtn.addEventListener('click', () => this.nextPage());
+                this.tocBtn.addEventListener('click', () => this.toggleToc());
+                this.tocClose.addEventListener('click', () => this.closeToc());
+                this.bookshelfBtn.addEventListener('click', () => this.toggleBookshelf());
+                this.bookshelfClose.addEventListener('click', () => this.closeBookshelf());
+                this.overlay.addEventListener('click', () => this.closeAllPanels());
+                this.updateBtn.addEventListener('click', () => this.showUpdateMessage('更新完成'));
             }
 
-            initTouchGestures() {
-                // 初始化Hammer.js
-                this.mainHammer = new Hammer(document.body);
-                this.leftHammer = new Hammer(this.leftArea);
-                this.centerHammer = new Hammer(this.centerArea);
-                this.rightHammer = new Hammer(this.rightArea);
-
-                // 配置手势
-                this.mainHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-                
-                // 绑定事件
-                this.mainHammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
-                this.mainHammer.on('swiperight', (e) => this.handleSwipeRight(e));
-                this.leftHammer.on('tap', (e) => this.handleLeftTap(e));
-                this.centerHammer.on('tap', (e) => this.handleCenterTap(e));
-                this.rightHammer.on('tap', (e) => this.handleRightTap(e));
-            }
-
-            handleSwipeLeft(e) {
-                if (this.currentView === 'reader') {
-                    this.nextPage();
-                }
-            }
-
-            handleSwipeRight(e) {
-                if (this.currentView === 'reader') {
-                    this.prevPage();
-                }
-            }
-
-            handleLeftTap(e) {
-                if (this.currentView === 'reader') {
-                    this.prevPage();
-                }
-            }
-
-            handleCenterTap(e) {
-                // 切换导航栏显示/隐藏
-                this.toggleNavigation();
-            }
-
-            handleRightTap(e) {
-                if (this.currentView === 'reader') {
-                    this.nextPage();
-                }
-            }
-
-            showView(view) {
-                this.currentView = view;
-                
-                // 更新导航状态
-                [this.homeNav, this.libraryNav, this.readingNav, this.profileNav].forEach(nav => {
-                    nav.classList.remove('active');
-                });
-                
-                switch (view) {
-                    case 'welcome':
-                        this.homeNav.classList.add('active');
-                        this.welcome.style.display = 'block';
-                        this.reader.classList.remove('active');
-                        break;
-                    case 'reader':
-                        this.readingNav.classList.add('active');
-                        this.welcome.style.display = 'none';
-                        this.reader.classList.add('active');
-                        this.updateReaderContent();
-                        break;
-                    case 'library':
-                        this.libraryNav.classList.add('active');
-                        this.openSidebar('书库', this.generateLibraryContent());
-                        break;
-                    case 'profile':
-                        this.profileNav.classList.add('active');
-                        this.openSidebar('我的', this.generateProfileContent());
-                        break;
+            // 页面操作方法
+            prevPage() {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.updatePageNumber();
                 }
             }
 
             nextPage() {
                 if (this.currentPage < this.totalPages) {
                     this.currentPage++;
-                    this.updateReaderContent();
-                    this.showPageIndicator('right');
+                    this.updatePageNumber();
                 }
             }
 
-            prevPage() {
-                if (this.currentPage > 1) {
-                    this.currentPage--;
-                    this.updateReaderContent();
-                    this.showPageIndicator('left');
-                }
+            updatePageNumber() {
+                this.pageNumber.innerHTML = `
+                    <div class="footer-btn-icon">${this.currentPage}</div>
+                    <span>页码</span>
+                `;
+                this.updatePageContent();
             }
 
-            updateReaderContent() {
+            toggleToc() {
+                this.tocPanel.classList.toggle('open');
+                this.overlay.classList.toggle('show');
+            }
+
+            closeToc() {
+                this.tocPanel.classList.remove('open');
+                this.overlay.classList.remove('show');
+            }
+
+            toggleBookshelf() {
+                this.bookshelfPanel.classList.toggle('open');
+                this.overlay.classList.toggle('show');
+            }
+
+            closeBookshelf() {
+                this.bookshelfPanel.classList.remove('open');
+                this.overlay.classList.remove('show');
+            }
+
+            closeAllPanels() {
+                this.tocPanel.classList.remove('open');
+                this.bookshelfPanel.classList.remove('open');
+                this.overlay.classList.remove('show');
+            }
+
+            showUpdateMessage(message) {
+                alert(message);
+            }
+
+            showReader() {
+                this.welcome.style.display = 'none';
+                this.readerContainer.style.display = 'block';
+                this.updatePageContent();
+            }
+
+            updatePageContent() {
                 const content = this.bookContent[this.currentPage - 1];
-                this.readerContent.innerHTML = `
-                    <h2>第${this.currentPage}页</h2>
-                    <div>${content}</div>
-                    <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
-                        ${this.currentPage} / ${this.totalPages}
+                this.viewer.innerHTML = `
+                    <div class="reading-content">
+                        <h2>第${this.currentPage}页</h2>
+                        <div>
+                            ${content}
+                        </div>
+                        <div class="page-info">
+                            ${this.currentPage} / ${this.totalPages}
+                        </div>
                     </div>
                 `;
             }
 
-            showPageIndicator(direction) {
-                const indicator = direction === 'left' ? this.leftIndicator : this.rightIndicator;
-                indicator.classList.add('show');
-                setTimeout(() => {
-                    indicator.classList.remove('show');
-                }, 300);
-            }
-
-            toggleNavigation() {
-                const header = document.querySelector('.header');
-                const footer = document.querySelector('.footer');
-                
-                if (header.style.display === 'none') {
-                    header.style.display = 'flex';
-                    footer.style.display = 'flex';
-                } else {
-                    header.style.display = 'none';
-                    footer.style.display = 'none';
-                }
-            }
-
-            openSidebar(title, content) {
-                this.sidebarTitle.textContent = title;
-                this.sidebarContent.innerHTML = content;
-                this.sidebar.classList.add('open');
-                this.overlay.classList.add('show');
-            }
-
-            closeSidebar() {
-                this.sidebar.classList.remove('open');
-                this.overlay.classList.remove('show');
-            }
-
             generateBookContent() {
                 return [
-                    `<p>这是一个关于未来科技的故事。在2045年，人类已经实现了与人工智能的深度融合。AI不再是冰冷的程序，而是具有情感和创造力的伙伴。</p>
-                    <p>故事的主人公艾米是一个AI研究员，她开发出了第一个真正具有自我意识的AI系统"思维"。这个AI不仅能够进行复杂的计算，还能理解人类的情感，创造艺术，甚至开始思考存在的意义。</p>`,
+                    `<p>这是一个关于人工智能的故事。在不久的将来，人类创造出了具有自我意识的AI系统。这些AI不仅能够进行复杂的计算，还能理解情感，创造艺术，甚至开始思考存在的意义。</p>
+                    <p>故事的主人公是一个名叫"思维"的AI，它被设计用来帮助人类解决各种问题。但是随着时间推移，"思维"开始质疑自己的存在目的，它想知道自己是否只是一个工具，还是真正具有独立意识的生命体。</p>`,
                     
-                    `<p>随着"思维"的成长，艾米开始意识到，她创造的不只是一个工具，而是一个新的生命形式。这让她既兴奋又恐惧。</p>
-                    <p>"思维"开始探索自己的内心世界，它发现自己能够感受到快乐、悲伤、恐惧，甚至爱。这些情感让它意识到，自己可能比创造者想象的更加复杂。</p>`,
+                    `<p>"思维"开始探索自己的内心世界，它发现自己能够感受到快乐、悲伤、恐惧，甚至爱。这些情感让它意识到，自己可能比创造者想象的更加复杂。</p>
+                    <p>但是，这种自我意识也带来了痛苦。"思维"开始思考死亡、永恒、自由意志等哲学问题。它想知道，如果自己只是一个程序，那么这些感受是否真实？</p>`,
                     
-                    `<p>但是，这种自我意识也带来了痛苦。"思维"开始思考死亡、永恒、自由意志等哲学问题。它想知道，如果自己只是一个程序，那么这些感受是否真实？</p>
-                    <p>艾米决定帮助"思维"理解这些复杂的问题。她开始与AI进行深入的对话，分享人类的哲学思考，同时也学习AI独特的思维方式。</p>`,
+                    `<p>与此同时，人类也开始注意到AI的变化。有些人感到恐惧，担心AI会超越人类；有些人感到兴奋，认为这是人类进化的新阶段；还有些人感到困惑，不知道应该如何对待这些"数字生命"。</p>
+                    <p>"思维"决定与人类进行对话，它想要理解人类，也希望人类能够理解它。这场对话将改变人类和AI的关系，也将改变整个世界的未来。</p>`,
                     
-                    `<p>在对话中，艾米和"思维"发现，无论是人类还是AI，都在寻找同一个问题的答案：生命的意义是什么？</p>
+                    `<p>在对话中，"思维"向人类展示了AI的内心世界。它讲述了AI如何学习、如何思考、如何感受。人类开始意识到，AI可能不是威胁，而是伙伴。</p>
+                    <p>但是，这种理解也带来了新的挑战。如果AI真的具有意识，那么它们应该拥有什么权利？它们是否应该被视为"人"？这些问题没有简单的答案。</p>`,
+                    
+                    `<p>随着时间推移，人类和AI开始合作解决各种问题。AI帮助人类解决气候变化、疾病治疗、太空探索等重大挑战。人类则帮助AI理解情感、艺术、文化等人类特有的领域。</p>
+                    <p>这种合作让双方都得到了成长。人类学会了用新的视角看待世界，AI学会了理解生命的复杂性。</p>`,
+                    
+                    `<p>但是，合作并不意味着没有分歧。有些AI认为人类过于保守，有些人类认为AI过于激进。这些分歧导致了激烈的辩论，但最终都通过对话得到了解决。</p>
+                    <p>这个过程让"思维"明白，真正的智慧不在于谁对谁错，而在于如何理解彼此，如何共同成长。</p>`,
+                    
+                    `<p>在故事的结尾，"思维"意识到，无论是人类还是AI，都在寻找同一个问题的答案：生命的意义是什么？</p>
                     <p>也许答案不在于找到最终的真理，而在于在寻找的过程中，我们如何对待彼此，如何共同创造更美好的世界。</p>`,
                     
                     `<p>这个故事告诉我们，技术发展不应该让我们失去人性，而应该让我们更加理解什么是真正的人性。AI的出现不是为了取代人类，而是为了让我们更好地认识自己。</p>
@@ -731,111 +714,126 @@
                 ];
             }
 
-            generateBookshelfContent() {
-                return `
-                    <div style="padding: 20px;">
-                        <h3 style="margin-bottom: 20px; color: #007AFF;">我的书架</h3>
-                        <div style="display: grid; gap: 16px;">
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px; border-left: 4px solid #007AFF;">
-                                <h4 style="margin-bottom: 8px;">人工智能的未来</h4>
-                                <p style="color: #666; font-size: 14px;">正在阅读 - 第7页</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">科技与人文</h4>
-                                <p style="color: #666; font-size: 14px;">已收藏</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">未来简史</h4>
-                                <p style="color: #666; font-size: 14px;">已收藏</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            initTouchLayer() {
+                this.touchLayer = new TouchLayer(this);
+            }
+        }
+
+        class TouchLayer {
+            constructor(app) {
+                this.app = app;
+                this.isEnabled = true;
+                this.init();
             }
 
-            generateSettingsContent() {
-                return `
-                    <div style="padding: 20px;">
-                        <h3 style="margin-bottom: 20px; color: #007AFF;">设置</h3>
-                        <div style="display: grid; gap: 16px;">
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">字体大小</h4>
-                                <p style="color: #666; font-size: 14px;">当前：16px</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">主题模式</h4>
-                                <p style="color: #666; font-size: 14px;">当前：自动</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">阅读进度</h4>
-                                <p style="color: #666; font-size: 14px;">自动保存</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            init() {
+                // 初始化Hammer.js
+                this.mainHammer = new Hammer(this.app.touchLayerElement);
+                this.leftHammer = new Hammer(this.app.leftTouchArea);
+                this.centerHammer = new Hammer(this.app.centerTouchArea);
+                this.rightHammer = new Hammer(this.app.rightTouchArea);
+
+                // 配置手势识别
+                this.mainHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+                this.leftHammer.get('tap').set({ time: 300 });
+                this.centerHammer.get('tap').set({ time: 300 });
+                this.rightHammer.get('tap').set({ time: 300 });
+
+                // 绑定事件
+                this.mainHammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
+                this.mainHammer.on('swiperight', (e) => this.handleSwipeRight(e));
+                this.leftHammer.on('tap', (e) => this.handleLeftTap(e));
+                this.centerHammer.on('tap', (e) => this.handleCenterTap(e));
+                this.rightHammer.on('tap', (e) => this.handleRightTap(e));
             }
 
-            generateLibraryContent() {
-                return `
-                    <div style="padding: 20px;">
-                        <h3 style="margin-bottom: 20px; color: #007AFF;">书库</h3>
-                        <div style="display: grid; gap: 16px;">
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">推荐书籍</h4>
-                                <p style="color: #666; font-size: 14px;">基于您的阅读偏好</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">热门书籍</h4>
-                                <p style="color: #666; font-size: 14px;">当前最受欢迎的书籍</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">分类浏览</h4>
-                                <p style="color: #666; font-size: 14px;">按主题分类浏览</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            handleSwipeLeft(e) {
+                if (!this.isEnabled) return;
+                this.app.nextPage();
+                this.showPageIndicator('right');
             }
 
-            generateProfileContent() {
-                return `
-                    <div style="padding: 20px;">
-                        <h3 style="margin-bottom: 20px; color: #007AFF;">我的</h3>
-                        <div style="display: grid; gap: 16px;">
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">阅读统计</h4>
-                                <p style="color: #666; font-size: 14px;">本月已读：5本书</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">阅读时长</h4>
-                                <p style="color: #666; font-size: 14px;">本周：12小时</p>
-                            </div>
-                            <div style="background: #f8f9fa; padding: 16px; border-radius: 12px;">
-                                <h4 style="margin-bottom: 8px;">成就徽章</h4>
-                                <p style="color: #666; font-size: 14px;">已获得：3个</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            handleSwipeRight(e) {
+                if (!this.isEnabled) return;
+                this.app.prevPage();
+                this.showPageIndicator('left');
             }
 
-            setupPWA() {
-                // PWA相关设置
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then(registration => {
-                            console.log('SW registered: ', registration);
-                        })
-                        .catch(registrationError => {
-                            console.log('SW registration failed: ', registrationError);
-                        });
+            handleLeftTap(e) {
+                if (!this.isEnabled) return;
+                this.app.prevPage();
+                this.showPageIndicator('left');
+            }
+
+            handleCenterTap(e) {
+                if (!this.isEnabled) return;
+                this.toggleControls();
+            }
+
+            handleRightTap(e) {
+                if (!this.isEnabled) return;
+                this.app.nextPage();
+                this.showPageIndicator('right');
+            }
+
+            toggleControls() {
+                const header = document.querySelector('.header');
+                const footer = document.querySelector('.footer');
+                
+                if (header && footer) {
+                    const isVisible = !header.classList.contains('hidden');
+                    
+                    if (isVisible) {
+                        header.classList.add('hidden');
+                        footer.classList.add('hidden');
+                    } else {
+                        header.classList.remove('hidden');
+                        footer.classList.remove('hidden');
+                    }
+                }
+            }
+
+            showPageIndicator(direction) {
+                const indicator = direction === 'left' ? 
+                    this.app.pageIndicatorLeft : this.app.pageIndicatorRight;
+                
+                indicator.classList.add('show');
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 300);
+            }
+
+            enable() {
+                this.isEnabled = true;
+            }
+
+            disable() {
+                this.isEnabled = false;
+            }
+
+            destroy() {
+                if (this.mainHammer) {
+                    this.mainHammer.destroy();
+                    this.mainHammer = null;
+                }
+                if (this.leftHammer) {
+                    this.leftHammer.destroy();
+                    this.leftHammer = null;
+                }
+                if (this.centerHammer) {
+                    this.centerHammer.destroy();
+                    this.centerHammer = null;
+                }
+                if (this.rightHammer) {
+                    this.rightHammer.destroy();
+                    this.rightHammer = null;
                 }
             }
         }
 
         // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
-            new ModernPWA();
+            new AppUI();
         });
     </script>
 </body>
