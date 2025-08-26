@@ -3,40 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-        <title>EPUB 阅读器</title>
+    <title>应用界面</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='24' fill='%232c3e50'/><rect x='48' y='48' width='96' height='96' rx='8' fill='white'/><rect x='60' y='60' width='72' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='72' width='63' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='84' width='72' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='96' width='54' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='108' width='63' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='120' width='45' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='132' width='72' height='4' rx='2' fill='%232c3e50'/></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="应用界面">
     
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232c3e50'/><rect x='25' y='20' width='50' height='60' rx='3' fill='white'/><rect x='30' y='30' width='40' height='2' fill='%232c3e50'/><rect x='30' y='38' width='35' height='2' fill='%232c3e50'/><rect x='30' y='46' width='40' height='2' fill='%232c3e50'/><rect x='30' y='54' width='30' height='2' fill='%232c3e50'/><rect x='30' y='62' width='35' height='2' fill='%232c3e50'/></svg>">
     
-    <!-- PWA 图标 -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='24' fill='%232c3e50'/><rect x='48' y='48' width='96' height='96' rx='8' fill='white'/><rect x='60' y='60' width='72' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='72' width='63' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='84' width='72' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='96' width='54' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='108' width='63' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='120' width='45' height='4' rx='2' fill='%232c3e50'/><rect x='60' y='132' width='72' height='4' rx='2' fill='%232c3e50'/></svg>">
-    
-    <!-- PWA 支持 -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- 主题色 -->
-    <meta name="theme-color" content="#2c3e50">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EPUB阅读器">
-    <script src="jszip.min.js"></script>
-    <script src="epub.min.js"></script>
-    <script src="hammer.min.js"></script>
     <style>
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             user-select: none;
         }
 
@@ -108,20 +96,25 @@
             transform: translateY(100%);
         }
 
-
-
-
-
-        .file-input {
-            display: none;
+        .btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        .controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .btn:hover {
+            background: #2c3e50;
         }
-        
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
         .page-number {
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -139,14 +132,79 @@
             gap: 10px;
             align-items: center;
         }
-        
-        /* 阅读器容器布局 */
+
+        .main-content {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            /* 确保完全填充屏幕 */
+            margin: 0;
+            padding: 0;
+            /* PWA模式下的特殊处理 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 50px 20px;
+            color: #7f8c8d;
+            overflow: hidden;
+        }
+
+        .welcome h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .welcome p {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
         .reader-container {
             position: relative;
             height: 100vh;
             width: 100vw;
+            display: none;
         }
         
+        .reader-container[style*="display: block"] {
+            display: block !important;
+        }
+
+        .viewer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            user-select: none;
+            overflow: auto;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            user-select: none;
+            /* 为工具栏留出空间 */
+            padding-top: calc(50px + env(safe-area-inset-top));
+            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            /* 添加边框 */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 10px 10px 0 10px;
+            background: white;
+            /* 确保在工具栏隐藏时能完全填充 */
+            box-sizing: border-box;
+        }
+
         /* 确保内容区域正确显示 */
         .viewer iframe {
             width: 100% !important;
@@ -257,137 +315,20 @@
         .page-indicator.show {
             opacity: 1;
         }
-        
-        /* 翻页动画 */
-        .page-transition {
-            transition: transform 0.3s ease-out;
-        }
-        
-        .page-transition.slide-left {
-            transform: translateX(-100%);
-        }
-        
-        .page-transition.slide-right {
-            transform: translateX(100%);
-        }
-        
 
-
-        .btn {
-            background: #34495e;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #2c3e50;
-        }
-
-        .btn:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-        }
-
-
-
-        .main-content {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: auto;
-            /* 确保完全填充屏幕 */
-            margin: 0;
-            padding: 0;
-            /* PWA模式下的特殊处理 */
-            position: absolute;
+        .overlay {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 50px;
-            color: #7f8c8d;
-            overflow: hidden;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .reader-container {
-            position: relative;
-            height: 100vh;
-            width: 100vw;
-            display: none;
-        }
-        
-        .reader-container[style*="display: block"] {
-            display: block !important;
-        }
-
-
-
-        .viewer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: transparent;
-            user-select: none;
-            overflow: auto;
-        }
-
-        /* 移除翻页区域指示器和调试区域样式 */
-
-
-
-        #viewer {
             width: 100%;
             height: 100%;
-            border: none;
-            user-select: none;
-            /* 为工具栏留出空间 */
-            padding-top: calc(50px + env(safe-area-inset-top));
-            padding-bottom: calc(60px + env(safe-area-inset-bottom));
-            /* 添加边框 */
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin: 10px 10px 0 10px;
-            background: white;
-            /* 确保在工具栏隐藏时能完全填充 */
-            box-sizing: border-box;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
         }
 
-        /* 移除翻页提示样式 */
-
-
-
-        .toc-btn {
-            background: #e74c3c;
-        }
-
-        .toc-btn:hover {
-            background: #c0392b;
+        .overlay.show {
+            display: block;
         }
 
         .toc-panel {
@@ -426,103 +367,6 @@
             cursor: pointer;
         }
 
-        .toc-list {
-            padding: 0;
-            list-style: none;
-        }
-
-        .toc-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ecf0f1;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toc-item:hover {
-            background: #f8f9fa;
-        }
-
-        .toc-item.active {
-            background: #3498db;
-            color: white;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
-        }
-
-        .overlay.show {
-            display: block;
-        }
-        
-
-
-        .welcome {
-            text-align: center;
-            padding: 50px 20px;
-            color: #7f8c8d;
-            overflow: hidden;
-        }
-
-        .welcome h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .welcome p {
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-
-
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2c3e50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1002;
-            display: none;
-            align-items: center;
-            gap: 15px;
-            max-width: 90%;
-        }
-        
-
-
-        .install-prompt button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .install-prompt button:hover {
-            background: #2980b9;
-        }
-
-        .install-prompt .close {
-            background: #95a5a6;
-            padding: 4px 8px;
-            font-size: 12px;
-        }
-
-        /* 书架样式 */
         .bookshelf-panel {
             position: fixed;
             top: 0;
@@ -548,185 +392,38 @@
             justify-content: space-between;
             align-items: center;
             font-size: 16px;
-            font-weight: 500;
         }
 
         .bookshelf-close {
             background: none;
             border: none;
             color: white;
-            font-size: 20px;
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 4px;
         }
-
-        .add-book-section {
-            padding: 16px;
-            border-bottom: 1px solid #eee;
-            background: #f8f9fa;
-        }
-
-        .add-book-btn {
-            width: 100%;
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .add-book-btn:hover {
-            background: #2980b9;
-        }
-
-        .bookshelf-list {
-            padding: 12px;
-        }
-
-        .book-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: white;
-        }
-
-        .book-item:hover {
-            border-color: #3498db;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
-        }
-
-        .book-cover {
-            width: 40px;
-            height: 56px;
-            background: #3498db;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-
-        .book-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .book-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #2c3e50;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 14px;
-        }
-
-        .book-author {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-bottom: 4px;
-        }
-
-        .book-progress {
-            font-size: 11px;
-            color: #3498db;
-            font-weight: 500;
-        }
-
-        .book-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .book-action-btn {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            transition: background 0.2s;
-        }
-
-        .book-action-btn:hover {
-            background: #7f8c8d;
-        }
-
-        .book-action-btn.delete {
-            background: #e74c3c;
-        }
-
-        .book-action-btn.delete:hover {
-            background: #c0392b;
-        }
-
-        .empty-bookshelf {
-            text-align: center;
-            padding: 40px 20px;
-            color: #7f8c8d;
-        }
-
-        .empty-bookshelf h3 {
-            margin-bottom: 12px;
-            color: #2c3e50;
-            font-size: 16px;
-        }
-
-        .empty-bookshelf p {
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
-
-        .add-book-hint {
-            background: #3498db;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-
     </style>
 </head>
-    <body>
-        <div class="header">
+<body>
+    <div class="header">
         <div class="controls">
             <button id="bookshelfBtn" class="btn">书架</button>
-            <button id="manualUpdateBtn" class="btn" style="background: #27ae60;">🔄 更新</button>
+            <button id="updateBtn" class="btn">更新</button>
         </div>
     </div>
 
-    <div class="main-content">
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>正在加载 EPUB 文件...</p>
-        </div>
-
+    <div id="mainContent" class="main-content">
+        <!-- 欢迎页面 -->
         <div id="welcome" class="welcome">
-            <h2>EPUB 阅读器</h2>
-            <p>点击"书架"添加您的第一本书</p>
+            <h2>应用界面</h2>
+            <p>这是一个干净的UI框架</p>
             <p style="margin-top: 20px; font-size: 14px; color: #3498db;">
-                💡 支持触摸操作，享受沉浸式阅读体验
+                💡 支持触摸操作，享受沉浸式体验
             </p>
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
-                <h3 style="margin-bottom: 15px; color: #2c3e50; font-size: 16px;">📖 阅读操作说明</h3>
+                <h3 style="margin-bottom: 15px; color: #2c3e50; font-size: 16px;">📱 操作说明</h3>
                 <div style="font-size: 13px; line-height: 1.6; color: #555;">
                     <p><strong>触摸操作：</strong></p>
-                    <p>• 左右滑动 → 翻页（全屏区域）</p>
+                    <p>• 左右滑动 → 切换页面（全屏区域）</p>
                     <p>• 点击屏幕中间 → 显示/隐藏工具栏</p>
                     <p>• 点击屏幕左侧 → 上一页</p>
                     <p>• 点击屏幕右侧 → 下一页</p>
@@ -737,11 +434,16 @@
             </div>
         </div>
 
-
-        
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
-                <div id="viewer"></div>
+                <div id="viewer">
+                    <!-- 示例内容区域 -->
+                    <div style="padding: 20px; text-align: center; color: #666;">
+                        <h3>内容显示区域</h3>
+                        <p>这里可以显示任何内容</p>
+                        <p>支持全屏显示和触摸操作</p>
+                    </div>
+                </div>
                 <!-- 触摸层 -->
                 <div id="touchLayer" class="touch-layer">
                     <!-- 左侧翻页区域 -->
@@ -760,9 +462,9 @@
         <!-- 底部工具栏 -->
         <div class="footer">
             <div class="footer-controls">
-                <button id="tocBtn" class="btn toc-btn" disabled>目录</button>
+                <button id="tocBtn" class="btn">目录</button>
                 <button id="prevBtn" class="btn">‹ 上一页</button>
-                <span id="pageNumber" class="page-number">7</span>
+                <span id="pageNumber" class="page-number">1</span>
                 <button id="nextBtn" class="btn">下一页 ›</button>
             </div>
         </div>
@@ -770,91 +472,57 @@
 
     <div id="overlay" class="overlay"></div>
     
-    <div id="installPrompt" class="install-prompt">
-        <span>安装应用以获得更好的体验</span>
-        <button id="installBtn">安装</button>
-        <button class="close" id="closeInstall">×</button>
-    </div>
-    
     <div id="tocPanel" class="toc-panel">
         <div class="toc-header">
             <h3>目录</h3>
             <button class="toc-close" id="tocClose">&times;</button>
         </div>
-        <ul id="tocList" class="toc-list"></ul>
     </div>
 
     <div id="bookshelfPanel" class="bookshelf-panel">
         <div class="bookshelf-header">
-            <h3>书架 <span id="bookCount" style="font-size: 14px; opacity: 0.8;">(0)</span></h3>
+            <h3>书架</h3>
             <button class="bookshelf-close" id="bookshelfClose">&times;</button>
-        </div>
-        <div class="add-book-section">
-            <input type="file" id="fileInput" class="file-input" accept=".epub">
-            <button class="add-book-btn" id="addBookBtn">
-                📚 添加书籍
-            </button>
-        </div>
-        <div id="bookshelfList" class="bookshelf-list">
-            <div class="empty-bookshelf">
-                <p>书架还是空的</p>
-                <div class="add-book-hint">点击上方按钮添加您的第一本书</div>
-            </div>
         </div>
     </div>
 
+    <script src="hammer.min.js"></script>
     <script>
-        class EpubReader {
+        class AppUI {
             constructor() {
-                this.book = null;
-                this.rendition = null;
-                this.currentCfi = null;
-                this.toc = [];
-                this.books = []; // 书架中的书籍
-                this.currentBookId = null; // 当前阅读的书籍ID
-                this.db = null; // IndexedDB 数据库
-                this.touchLayer = null; // 触摸层实例
+                this.currentPage = 1;
+                this.totalPages = 10;
+                this.isControlsVisible = true;
                 
                 this.initElements();
                 this.bindEvents();
-                this.initDatabase().then(() => {
-                    this.loadBookshelf().then(() => {
-                        this.updateWelcomePage(); // 更新欢迎页面
-                        this.restoreLastReadBook(); // 恢复上次阅读的书籍
-                    });
-                });
+                this.initTouchLayer();
             }
 
             initElements() {
-                this.fileInput = document.getElementById('fileInput');
                 this.loading = document.getElementById('loading');
                 this.welcome = document.getElementById('welcome');
                 this.readerContainer = document.getElementById('readerContainer');
                 this.viewer = document.getElementById('viewer');
 
-                
                 // 按钮
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
                 this.tocBtn = document.getElementById('tocBtn');
                 this.bookshelfBtn = document.getElementById('bookshelfBtn');
-                this.addBookBtn = document.getElementById('addBookBtn');
-                this.manualUpdateBtn = document.getElementById('manualUpdateBtn');
+                this.updateBtn = document.getElementById('updateBtn');
                 
                 // 翻页按钮和页码
                 this.pageNumber = document.getElementById('pageNumber');
                 
                 // 目录
                 this.tocPanel = document.getElementById('tocPanel');
-                this.tocList = document.getElementById('tocList');
                 this.tocClose = document.getElementById('tocClose');
                 this.overlay = document.getElementById('overlay');
                 
                 // 书架
                 this.bookshelfPanel = document.getElementById('bookshelfPanel');
-                this.bookshelfList = document.getElementById('bookshelfList');
                 this.bookshelfClose = document.getElementById('bookshelfClose');
-                this.bookCount = document.getElementById('bookCount');
                 
                 // 触摸层元素
                 this.touchLayerElement = document.getElementById('touchLayer');
@@ -863,35 +531,9 @@
                 this.rightTouchArea = document.getElementById('rightTouchArea');
                 this.pageIndicatorLeft = document.getElementById('pageIndicatorLeft');
                 this.pageIndicatorRight = document.getElementById('pageIndicatorRight');
-                
-                // 手动更新按钮事件
-                this.manualUpdateBtn.addEventListener('click', () => {
-                    this.manualUpdate();
-                });
             }
 
             bindEvents() {
-                this.fileInput.addEventListener('change', async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        try {
-                            // 创建 EPUB 实例来获取元数据
-                            const tempBook = ePub(file);
-                            await tempBook.ready;
-                            const metadata = await tempBook.loaded.metadata;
-                            
-                            // 添加到书架
-                            this.addToBookshelf(file, metadata);
-                            
-                            // 清空文件输入
-                            this.fileInput.value = '';
-                        } catch (error) {
-                            console.error('添加书籍失败:', error);
-                            alert('添加书籍失败，请检查文件格式是否正确');
-                        }
-                    }
-                });
-                this.addBookBtn.addEventListener('click', () => this.fileInput.click());
                 this.prevBtn.addEventListener('click', () => this.prevPage());
                 this.nextBtn.addEventListener('click', () => this.nextPage());
                 this.tocBtn.addEventListener('click', () => this.toggleToc());
@@ -899,416 +541,31 @@
                 this.bookshelfBtn.addEventListener('click', () => this.toggleBookshelf());
                 this.bookshelfClose.addEventListener('click', () => this.closeBookshelf());
                 this.overlay.addEventListener('click', () => this.closeAllPanels());
-                
-                            // 移除键盘翻页支持
-            // document.addEventListener('keydown', (e) => this.handleKeyDown(e));
-                
-                // 移除全局点击事件监听
-                // document.addEventListener('click', (e) => this.handleGlobalClick(e));
-                
-                // 页面滚动已启用
+                this.updateBtn.addEventListener('click', () => this.showUpdateMessage('更新完成'));
             }
-            
-            // 移除页面滚动控制方法
-            // disablePageScroll() {
-            //     // 页面滚动已启用，无需额外处理
-            // }
-            
 
-            
-
-            
-            // 手动更新方法
-            manualUpdate() {
-                // 显示更新状态
-                this.manualUpdateBtn.textContent = '🔄 更新中...';
-                this.manualUpdateBtn.disabled = true;
-                
-                // 显示更新提示
-                this.showUpdateMessage('正在检查更新...');
-                
-                // 检查是否有新版本（通过检查缓存）
-                if ('caches' in window) {
-                    caches.keys().then(cacheNames => {
-                        this.showUpdateMessage('正在清除缓存...');
-                        // 清除所有缓存
-                        return Promise.all(
-                            cacheNames.map(cacheName => caches.delete(cacheName))
-                        );
-                    }).then(() => {
-                        this.showUpdateMessage('正在重新加载...');
-                        // 清除缓存后刷新页面
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 100);
-                    }).catch(() => {
-                        this.showUpdateMessage('更新失败，正在重试...');
-                        // 如果清除缓存失败，直接刷新
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 100);
-                    });
-                } else {
-                    this.showUpdateMessage('正在重新加载...');
-                    // 如果不支持缓存API，直接刷新
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100);
-                }
-                
-                // 3秒后恢复按钮状态（防止无限等待）
-                setTimeout(() => {
-                    this.manualUpdateBtn.textContent = '🔄 更新';
-                    this.manualUpdateBtn.disabled = false;
-                    this.hideUpdateMessage();
-                }, 3000);
-            }
-            
-            // 显示更新消息
-            showUpdateMessage(message) {
-                let updateMsg = document.getElementById('updateMessage');
-                if (!updateMsg) {
-                    updateMsg = document.createElement('div');
-                    updateMsg.id = 'updateMessage';
-                    updateMsg.style.cssText = `
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background: rgba(44, 62, 80, 0.9);
-                        color: white;
-                        padding: 15px 20px;
-                        border-radius: 8px;
-                        z-index: 10000;
-                        font-size: 14px;
-                        backdrop-filter: blur(10px);
-                    `;
-                    document.body.appendChild(updateMsg);
-                }
-                updateMsg.textContent = message;
-                updateMsg.style.display = 'block';
-            }
-            
-            // 隐藏更新消息
-            hideUpdateMessage() {
-                const updateMsg = document.getElementById('updateMessage');
-                if (updateMsg) {
-                    updateMsg.style.display = 'none';
+            // 简化的页面操作方法
+            prevPage() {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.updatePageNumber();
                 }
             }
 
-            async loadBook(file) {
-                if (!file) return;
-
-                this.showLoading();
-                
-                try {
-                    // 清理之前的书籍实例
-                    this.cleanupCurrentBook();
-                    
-                    // 添加小延迟确保清理完成
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // 创建 EPUB 实例
-                    this.book = ePub(file);
-                    
-                    // 等待书籍加载完成
-                    await this.book.ready;
-                    
-                    // 获取书籍信息
-                    const metadata = await this.book.loaded.metadata;
-                    
-                    // 获取目录
-                    this.toc = await this.book.loaded.navigation;
-                    this.renderToc();
-                    
-                    // 确保viewer容器是干净的
-                    if (this.viewer) {
-                        this.viewer.innerHTML = '';
-                    }
-                    
-                    // 创建渲染器
-                    this.rendition = this.book.renderTo(this.viewer, {
-                        width: '100%',
-                        height: '100%',
-                        flow: 'paginated',
-                        allowScriptedContent: true,
-                        allowPopups: true
-                    });
-                    
-                    // 绑定渲染器事件
-                    this.rendition.on('relocated', (location) => {
-                        this.currentCfi = location.start.cfi;
-                        this.updateNavigation();
-                        this.saveReadingProgress(); // 保存阅读进度
-                    });
-
-                    // 处理iframe的sandbox问题 - 使用更安全的配置
-                    this.rendition.on('rendered', (section) => {
-                        const iframe = this.viewer.querySelector('iframe');
-                        if (iframe) {
-                            // 只允许脚本执行，不允许访问父页面资源
-                            iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
-                        }
-                    });
-                    
-                    // 显示阅读器
-                    this.showReader();
-                    
-                    // 开始渲染
-                    await this.rendition.display();
-                    
-                    // 恢复阅读位置
-                    this.restoreReadingPosition();
-                    
-                    // 关闭书架
-                    this.closeBookshelf();
-                    
-                    // 书籍加载完成
-                    console.log('书籍加载完成');
-                    
-                } catch (error) {
-                    console.error('加载书籍失败:', error);
-                    alert('加载书籍失败，请检查文件格式是否正确。');
-                    this.hideLoading();
-                    // 清理失败的实例
-                    this.cleanupCurrentBook();
+            nextPage() {
+                if (this.currentPage < this.totalPages) {
+                    this.currentPage++;
+                    this.updatePageNumber();
                 }
             }
 
-            showLoading() {
-                this.loading.style.display = 'block';
-                this.welcome.style.display = 'none';
-                this.readerContainer.style.display = 'none';
-                // 移除页面控制隐藏
-                // this.hidePageControls();
-                
-                // 更新加载文本
-                const loadingText = this.loading.querySelector('p');
-                if (loadingText) {
-                    loadingText.textContent = '正在加载 EPUB 文件...';
-                }
-            }
-
-            showBookSwitchLoading() {
-                this.loading.style.display = 'block';
-                this.welcome.style.display = 'none';
-                this.readerContainer.style.display = 'none';
-                
-                // 更新加载文本
-                const loadingText = this.loading.querySelector('p');
-                if (loadingText) {
-                    loadingText.textContent = '正在切换书籍...';
-                }
-            }
-
-            showRestoreLoading() {
-                this.loading.style.display = 'block';
-                this.welcome.style.display = 'none';
-                this.readerContainer.style.display = 'none';
-                
-                // 更新加载文本
-                const loadingText = this.loading.querySelector('p');
-                if (loadingText) {
-                    loadingText.textContent = '正在恢复上次阅读...';
-                }
-            }
-
-            hideLoading() {
-                this.loading.style.display = 'none';
-            }
-
-            showReader() {
-                this.hideLoading();
-                this.readerContainer.style.display = 'block';
-                this.updateNavigation();
-                
-                // 初始化触摸层
-                this.initTouchLayer();
-            }
-
-            async prevPage() {
-                if (this.rendition) {
-                    await this.rendition.prev();
-                }
-            }
-
-            async nextPage() {
-                if (this.rendition) {
-                    await this.rendition.next();
-                }
-            }
-            
-            // 初始化触摸层
-            initTouchLayer() {
-                if (this.touchLayer) {
-                    this.touchLayer.destroy();
-                }
-                
-                this.touchLayer = new TouchLayer(this);
-                console.log('触摸层初始化完成');
-            }
-
-
-
-            // 移除翻页提示
-            // showPageHint(direction) {
-            //     // 已移除翻页提示功能
-            // }
-
-            // 移除键盘事件处理
-            // handleKeyDown(e) {
-            //     // 已移除键盘翻页功能
-            // }
-
-            // 移除跳转到开头和结尾的方法
-            // goToBeginning() {
-            //     // 已移除键盘翻页功能
-            // }
-
-            // goToEnd() {
-            //     // 已移除键盘翻页功能
-            // }
-
-
-
-
-
-            // 移除Hammer.js手势事件设置
-            // setupEpubClickEvents() {
-            //     // 已移除Hammer.js相关代码
-            // }
-
-
-
-
-
-
-
-
-
-
-
-            // 移除Hammer.js点击事件处理
-            // handleHammerTap(e) {
-            //     // 已移除Hammer.js相关代码
-            // }
-
-            // 移除Hammer.js滑动事件处理
-            // handleSwipeLeft(e) {
-            //     // 已移除Hammer.js相关代码
-            // }
-
-            // handleSwipeRight(e) {
-            //     // 已移除Hammer.js相关代码
-            // }
-
-            // 移除EPUB.js点击事件处理
-            // handleEpubClick(e) {
-            //     // 已移除点击翻页功能
-            // }
-
-            // 移除翻页区域指示器
-            // showPageIndicator(direction) {
-            //     // 已移除翻页区域指示器功能
-            // }
-
-            // 移除调试相关方法
-            // toggleDebugMode() {
-            //     // 已移除调试功能
-            // }
-
-            // showDebugIndicators() {
-            //     // 已移除调试功能
-            // }
-
-            // hideDebugIndicators() {
-            //     // 已移除调试功能
-            // }
-
-            // 移除全局点击事件处理
-            // handleGlobalClick(e) {
-            //     // 已移除鼠标点击翻页功能
-            // }
-
-            // 移除阅读提示方法
-            // showReadingTips() {
-            //     // 已移除阅读提示功能
-            // }
-
-
-
-
-            
-            updatePageNumber(location) {
-                if (this.pageNumber && location) {
-                    // 计算当前页码
-                    const currentPage = location.start.location || 1;
-                    this.pageNumber.textContent = currentPage;
-                }
-            }
-            
-            updateNavigation() {
-                const hasBook = !!this.book;
-                this.prevBtn.disabled = !hasBook;
-                this.nextBtn.disabled = !hasBook;
-                this.tocBtn.disabled = !hasBook;
-            }
-
-            renderToc() {
-                this.tocList.innerHTML = '';
-                
-                // 递归渲染目录项
-                const renderTocItems = (items, level = 0) => {
-                    items.forEach(item => {
-                        const li = document.createElement('li');
-                        li.className = 'toc-item';
-                        li.style.paddingLeft = `${15 + level * 20}px`;
-                        li.textContent = item.label;
-                        li.addEventListener('click', () => this.navigateToToc(item.href));
-                        
-
-                        this.tocList.appendChild(li);
-                        
-                        // 如果有子目录，递归渲染
-                        if (item.subitems && item.subitems.length > 0) {
-                            renderTocItems(item.subitems, level + 1);
-                        }
-                    });
-                };
-                
-                // 渲染主目录
-                if (this.toc.toc && this.toc.toc.length > 0) {
-                    renderTocItems(this.toc.toc);
-                } else if (this.toc && this.toc.length > 0) {
-                    // 备用方案：直接使用toc数组
-                    renderTocItems(this.toc);
-                }
-                
-                // 如果没有目录，显示提示
-                if (this.tocList.children.length === 0) {
-                    const li = document.createElement('li');
-                    li.className = 'toc-item';
-                    li.textContent = '暂无目录信息';
-                    li.style.color = '#999';
-                    this.tocList.appendChild(li);
-                }
-            }
-
-            async navigateToToc(href) {
-                if (this.rendition) {
-                    try {
-                        await this.rendition.display(href);
-                        this.closeToc();
-                    } catch (error) {
-                        console.error('目录导航失败:', error);
-                    }
-                }
+            updatePageNumber() {
+                this.pageNumber.textContent = this.currentPage;
             }
 
             toggleToc() {
-                this.tocPanel.classList.add('open');
-                this.overlay.classList.add('show');
+                this.tocPanel.classList.toggle('open');
+                this.overlay.classList.toggle('show');
             }
 
             closeToc() {
@@ -1316,306 +573,9 @@
                 this.overlay.classList.remove('show');
             }
 
-            closeAllPanels() {
-                this.closeToc();
-                this.closeBookshelf();
-            }
-
-            // 书架相关方法
-            async loadBookshelf() {
-                try {
-                    this.books = await this.loadAllBooksFromDB();
-                    
-                    // 验证和修复数据
-                    this.books = this.books.filter(book => {
-                        if (!book || !book.id) return false;
-                        
-                        // 修复缺失字段
-                        if (!book.title) {
-                            book.title = book.filename ? book.filename.replace('.epub', '') : '未知标题';
-                        }
-                        if (!book.author) {
-                            book.author = '未知作者';
-                        }
-                        if (!book.addedAt) {
-                            book.addedAt = new Date().toISOString();
-                        }
-                        
-                        return true;
-                    });
-                    
-                    this.renderBookshelf();
-                } catch (error) {
-                    console.error('加载书架失败:', error);
-                    this.books = [];
-                    this.renderBookshelf();
-                }
-            }
-
-            saveBookshelf() {
-                // 只保存元数据到 localStorage，文件数据保存在 IndexedDB
-                const booksForStorage = this.books.map(book => {
-                    const { fileData, ...bookWithoutData } = book;
-                    return bookWithoutData;
-                });
-                localStorage.setItem('epubBookshelf', JSON.stringify(booksForStorage));
-            }
-
-            async addToBookshelf(file, metadata) {
-                const bookId = this.generateBookId(file);
-                const existingIndex = this.books.findIndex(book => book.id === bookId);
-                
-                try {
-                    const fileData = await this.fileToArrayBuffer(file);
-                    const bookInfo = {
-                        id: bookId,
-                        title: metadata.title || file.name.replace('.epub', '') || '未知标题',
-                        author: metadata.creator || '未知作者',
-                        filename: file.name,
-                        size: file.size,
-                        lastRead: new Date().toISOString(),
-                        progress: null,
-                        addedAt: new Date().toISOString(),
-                        fileData: fileData
-                    };
-
-                    await this.saveBookToDB(bookInfo);
-
-                    if (existingIndex >= 0) {
-                        this.books[existingIndex] = { ...this.books[existingIndex], ...bookInfo };
-                    } else {
-                        this.books.unshift(bookInfo);
-                    }
-
-                    this.currentBookId = bookId;
-                    this.saveBookshelf();
-                    this.renderBookshelf();
-                    this.showAddBookSuccess(bookInfo.title);
-                } catch (error) {
-                    console.error('添加书籍失败:', error);
-                    alert('添加书籍失败，请重试');
-                }
-            }
-
-            generateBookId(file) {
-                // 使用文件名和大小生成唯一ID
-                return `${file.name}_${file.size}`;
-            }
-
-                        renderBookshelf() {
-                // 更新书籍数量
-                this.bookCount.textContent = `(${this.books.length})`;
-                
-                if (this.books.length === 0) {
-                    this.bookshelfList.innerHTML = `
-                    <div class="empty-bookshelf">
-                        <h3>📚 书架还是空的</h3>
-                        <p>点击上方按钮添加书籍</p>
-                    </div>
-                `;
-                    return;
-                }
-
-                // 按最后阅读时间排序
-                const sortedBooks = [...this.books].sort((a, b) => {
-                    if (!a.lastRead) return 1;
-                    if (!b.lastRead) return -1;
-                    return new Date(b.lastRead) - new Date(a.lastRead);
-                });
-
-                this.bookshelfList.innerHTML = sortedBooks.map(book => {
-                    const title = book.title || book.filename || '未知标题';
-                    const author = book.author || '未知作者';
-                    const coverLetter = title.charAt(0).toUpperCase();
-                    
-                    return `
-                        <div class="book-item" data-book-id="${book.id}">
-                            <div class="book-cover">
-                                ${coverLetter}
-                            </div>
-                            <div class="book-info">
-                                <div class="book-title" title="${title}">${title}</div>
-                                <div class="book-author">${author}</div>
-                                <div class="book-progress">
-                                    ${book.progress ? `${book.progress}%` : '未读'}
-                                </div>
-                            </div>
-                            <div class="book-actions">
-                                <button class="book-action-btn delete" data-book-id="${book.id}">×</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                // 绑定点击事件
-                this.bookshelfList.querySelectorAll('.book-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const bookId = item.dataset.bookId;
-                        this.loadBookFromBookshelf(bookId);
-                    });
-                });
-
-                // 绑定删除按钮事件
-                this.bookshelfList.querySelectorAll('.book-action-btn.delete').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const bookId = btn.dataset.bookId;
-                        this.removeBook(bookId);
-                    });
-                });
-            }
-
-            async loadBookFromBookshelf(bookId) {
-                const book = this.books.find(b => b.id === bookId);
-                if (!book) return;
-
-                try {
-                    // 从 IndexedDB 加载完整的书籍数据
-                    const fullBookData = await this.loadBookFromDB(bookId);
-                    if (!fullBookData || !fullBookData.fileData) {
-                        alert('书籍数据已丢失，请重新添加');
-                        return;
-                    }
-
-                    this.currentBookId = bookId;
-                    // 保存当前阅读的书籍ID
-                    localStorage.setItem('lastReadBookId', bookId);
-                    this.showBookSwitchLoading();
-                    
-                    // 清理之前的书籍实例
-                    this.cleanupCurrentBook();
-                    
-                    // 添加小延迟确保清理完成
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // 从 ArrayBuffer 创建 Blob
-                    const blob = new Blob([fullBookData.fileData], { type: 'application/epub+zip' });
-                    
-                    // 创建 EPUB 实例
-                    this.book = ePub(blob);
-                    
-                    // 等待书籍加载完成
-                    await this.book.ready;
-                    
-                    // 获取书籍信息
-                    const metadata = await this.book.loaded.metadata;
-                    
-                    // 获取目录
-                    this.toc = await this.book.loaded.navigation;
-                    this.renderToc();
-                    
-                    // 确保viewer容器是干净的
-                    if (this.viewer) {
-                        this.viewer.innerHTML = '';
-                    }
-                    
-                    // 创建渲染器
-                    this.rendition = this.book.renderTo(this.viewer, {
-                        width: '100%',
-                        height: '100%',
-                        flow: 'paginated',
-                        allowScriptedContent: true,
-                        allowPopups: true
-                    });
-                    
-                    // 绑定渲染器事件
-                    this.rendition.on('relocated', (location) => {
-                        this.currentCfi = location.start.cfi;
-                        this.updateNavigation();
-                        this.saveReadingProgress(); // 保存阅读进度
-                    });
-
-                    // 处理iframe的sandbox问题 - 使用更安全的配置
-                    this.rendition.on('rendered', (section) => {
-                        const iframe = this.viewer.querySelector('iframe');
-                        if (iframe) {
-                            // 只允许脚本执行，不允许访问父页面资源
-                            iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
-                        }
-                    });
-                    
-                    // 显示阅读器
-                    this.showReader();
-                    
-                    // 开始渲染
-                    await this.rendition.display();
-                    
-                    // 恢复阅读位置
-                    this.restoreReadingPosition();
-                    
-                    // 关闭书架
-                    this.closeBookshelf();
-                    
-                    // 书籍加载完成
-                    console.log('从书架加载书籍完成');
-                    
-                } catch (error) {
-                    console.error('从书架加载书籍失败:', error);
-                    alert('加载书籍失败，请重新添加书籍');
-                    this.hideLoading();
-                    // 清理失败的实例
-                    this.cleanupCurrentBook();
-                }
-            }
-
-                        async removeBook(bookId) {
-                if (confirm('确定要删除这本书吗？')) {
-                    try {
-                        await this.deleteBookFromDB(bookId);
-                        this.books = this.books.filter(book => book.id !== bookId);
-                        
-                        // 如果删除的是当前阅读的书籍，清理localStorage
-                        const lastReadBookId = localStorage.getItem('lastReadBookId');
-                        if (lastReadBookId === bookId) {
-                            localStorage.removeItem('lastReadBookId');
-                        }
-                        
-                        this.saveBookshelf();
-                        this.renderBookshelf();
-                } catch (error) {
-                        console.error('删除失败:', error);
-                        alert('删除失败，请重试');
-                    }
-                }
-            }
-
-            async saveReadingProgress() {
-                if (!this.currentBookId || !this.currentCfi) return;
-                
-                const bookIndex = this.books.findIndex(book => book.id === this.currentBookId);
-                if (bookIndex >= 0) {
-                    let progress = 0;
-                    if (this.book && this.book.spine) {
-                        const spineItems = this.book.spine.items;
-                        const currentSpineItem = this.rendition.currentLocation();
-                        if (currentSpineItem && currentSpineItem.start) {
-                            const currentIndex = spineItems.findIndex(item => 
-                                item.href === currentSpineItem.start.href
-                            );
-                            if (currentIndex >= 0) {
-                                progress = Math.round(((currentIndex + 1) / spineItems.length) * 100);
-                            }
-                        }
-                    }
-                    
-                    this.books[bookIndex].progress = progress;
-                    this.books[bookIndex].lastCfi = this.currentCfi;
-                    this.books[bookIndex].lastRead = new Date().toISOString();
-                    
-                    try {
-                        await this.saveBookToDB(this.books[bookIndex]);
-                } catch (error) {
-                        console.error('保存进度失败:', error);
-                    }
-                    
-                    this.saveBookshelf();
-                    this.renderBookshelf();
-                }
-            }
-
             toggleBookshelf() {
-                this.bookshelfPanel.classList.add('open');
-                this.overlay.classList.add('show');
+                this.bookshelfPanel.classList.toggle('open');
+                this.overlay.classList.toggle('show');
             }
 
             closeBookshelf() {
@@ -1623,399 +583,79 @@
                 this.overlay.classList.remove('show');
             }
 
-            restoreReadingPosition() {
-                if (!this.currentBookId) return;
-                
-                const book = this.books.find(b => b.id === this.currentBookId);
-                if (book && book.lastCfi && this.rendition) {
-                    try {
-                        this.rendition.display(book.lastCfi);
-                    } catch (error) {
-                        console.log('恢复阅读位置失败:', error);
-                    }
-                }
+            closeAllPanels() {
+                this.tocPanel.classList.remove('open');
+                this.bookshelfPanel.classList.remove('open');
+                this.overlay.classList.remove('show');
             }
 
-
-
-            showAddBookSuccess(title) {
-                const toast = document.createElement('div');
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #27ae60;
-                    color: white;
-                    padding: 10px 16px;
-                    border-radius: 6px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    z-index: 10000;
-                    font-size: 13px;
-                    transform: translateX(100%);
-                    transition: transform 0.2s ease;
-                `;
-                toast.textContent = `📚 ${title} 已添加`;
-                
-                document.body.appendChild(toast);
-                setTimeout(() => toast.style.transform = 'translateX(0)', 100);
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(100%)';
-                    setTimeout(() => document.body.removeChild(toast), 200);
-                }, 2000);
+            showUpdateMessage(message) {
+                alert(message);
             }
 
-            async restoreLastReadBook() {
-                try {
-                    // 从 localStorage 获取上次阅读的书籍ID
-                    const lastReadBookId = localStorage.getItem('lastReadBookId');
-                    if (!lastReadBookId) return;
-
-                    // 检查书籍是否还在书架中
-                    const book = this.books.find(b => b.id === lastReadBookId);
-                    if (!book) {
-                        localStorage.removeItem('lastReadBookId');
-                        return;
-                    }
-
-                    // 检查是否在24小时内阅读过
-                    const lastReadTime = new Date(book.lastRead);
-                    const now = new Date();
-                    const hoursSinceLastRead = (now - lastReadTime) / (1000 * 60 * 60);
-                    
-                    // 如果24小时内阅读过，自动恢复；否则询问用户
-                    if (hoursSinceLastRead < 24) {
-                        console.log('自动恢复上次阅读的书籍:', book.title);
-                        this.showRestoreLoading();
-                        await this.loadBookFromBookshelf(lastReadBookId);
-                    } else {
-                        const shouldRestore = confirm(`是否恢复阅读《${book.title}》？\n上次阅读时间：${lastReadTime.toLocaleString()}`);
-                        if (shouldRestore) {
-                            this.showRestoreLoading();
-                            await this.loadBookFromBookshelf(lastReadBookId);
-                        }
-                    }
-                } catch (error) {
-                    console.error('恢复上次阅读失败:', error);
-                }
+            initTouchLayer() {
+                this.touchLayer = new TouchLayer(this);
             }
-
-            updateWelcomePage() {
-                const lastReadBookId = localStorage.getItem('lastReadBookId');
-                if (lastReadBookId) {
-                    const book = this.books.find(b => b.id === lastReadBookId);
-                    if (book) {
-                        const welcomeText = document.querySelector('.welcome p');
-                        if (welcomeText) {
-                            welcomeText.innerHTML = `点击"书架"开始阅读<br><small style="color: #3498db;">上次阅读：《${book.title}》</small>`;
-                        }
-                    }
-                }
-            }
-
-            // IndexedDB 相关方法
-            async initDatabase() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open('EpubReaderDB', 1);
-                    
-                    request.onerror = () => {
-                        console.error('数据库打开失败');
-                        reject(request.error);
-                    };
-                    
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        console.log('数据库初始化成功');
-                        resolve();
-                    };
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        // 创建书籍存储对象
-                        if (!db.objectStoreNames.contains('books')) {
-                            const bookStore = db.createObjectStore('books', { keyPath: 'id' });
-                            bookStore.createIndex('title', 'title', { unique: false });
-                            bookStore.createIndex('addedAt', 'addedAt', { unique: false });
-                        }
-                        
-                        console.log('数据库结构创建完成');
-                    };
-                });
-            }
-
-            async saveBookToDB(bookInfo) {
-                return new Promise((resolve, reject) => {
-                    if (!this.db) {
-                        reject(new Error('数据库未初始化'));
-                        return;
-                    }
-                    
-                    const transaction = this.db.transaction(['books'], 'readwrite');
-                        const store = transaction.objectStore('books');
-                    const request = store.put(bookInfo);
-                    
-                    request.onsuccess = () => {
-                        console.log('书籍保存到数据库成功');
-                        resolve();
-                    };
-                    
-                    request.onerror = () => {
-                        console.error('保存书籍失败:', request.error);
-                        reject(request.error);
-                    };
-                });
-            }
-
-            async loadBookFromDB(bookId) {
-                return new Promise((resolve, reject) => {
-                    if (!this.db) {
-                        reject(new Error('数据库未初始化'));
-                        return;
-                    }
-                    
-                    const transaction = this.db.transaction(['books'], 'readonly');
-                        const store = transaction.objectStore('books');
-                    const request = store.get(bookId);
-                    
-                    request.onsuccess = () => {
-                        resolve(request.result);
-                    };
-                    
-                    request.onerror = () => {
-                        console.error('从数据库加载书籍失败:', request.error);
-                        reject(request.error);
-                    };
-                });
-            }
-
-            async deleteBookFromDB(bookId) {
-                return new Promise((resolve, reject) => {
-                    if (!this.db) {
-                        reject(new Error('数据库未初始化'));
-                        return;
-                    }
-                    
-                    const transaction = this.db.transaction(['books'], 'readwrite');
-                    const store = transaction.objectStore('books');
-                    const request = store.delete(bookId);
-                    
-                    request.onsuccess = () => {
-                        console.log('从数据库删除书籍成功');
-                        resolve();
-                    };
-                    
-                    request.onerror = () => {
-                        console.error('删除书籍失败:', request.error);
-                        reject(request.error);
-                    };
-                });
-            }
-
-            async loadAllBooksFromDB() {
-                return new Promise((resolve, reject) => {
-                    if (!this.db) {
-                        reject(new Error('数据库未初始化'));
-                    return;
-                }
-
-                    const transaction = this.db.transaction(['books'], 'readonly');
-                    const store = transaction.objectStore('books');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => {
-                        resolve(request.result || []);
-                    };
-                    
-                    request.onerror = () => {
-                        console.error('从数据库加载所有书籍失败:', request.error);
-                        reject(request.error);
-                    };
-                });
-            }
-
-            fileToArrayBuffer(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = (e) => reject(e.target.error);
-                    reader.readAsArrayBuffer(file);
-                });
-            }
-
-            cleanupCurrentBook() {
-                // 清理触摸层
-                if (this.touchLayer) {
-                    this.touchLayer.destroy();
-                    this.touchLayer = null;
-                }
-                
-                // 清理渲染器
-                if (this.rendition) {
-                    try {
-                        // 移除所有事件监听器
-                        this.rendition.off('relocated');
-                        this.rendition.off('rendered');
-                        this.rendition.destroy();
-                    } catch (error) {
-                        console.log('清理渲染器时出错:', error);
-                    }
-                    this.rendition = null;
-                }
-
-                // 清理书籍实例
-                if (this.book) {
-                    try {
-                        this.book.destroy();
-                    } catch (error) {
-                        console.log('清理书籍实例时出错:', error);
-                    }
-                    this.book = null;
-                }
-
-                // 清理目录
-                this.toc = [];
-                this.currentCfi = null;
-
-                // 清空阅读器容器（保留触摸层和指示器）
-                if (this.viewer) {
-                    const iframe = this.viewer.querySelector('iframe');
-                    if (iframe) {
-                        iframe.remove();
-                    }
-                }
-
-                // 清空目录列表
-                if (this.tocList) {
-                    this.tocList.innerHTML = '';
-                }
-
-                // 强制垃圾回收（如果浏览器支持）
-                if (window.gc) {
-                    window.gc();
-                }
-
-                console.log('书籍实例清理完成');
-            }
-
         }
 
-        // 触摸层类
         class TouchLayer {
-            constructor(reader) {
-                this.reader = reader;
-                this.mainHammer = null;
-                this.leftHammer = null;
-                this.centerHammer = null;
-                this.rightHammer = null;
+            constructor(app) {
+                this.app = app;
                 this.isEnabled = true;
-                
                 this.init();
             }
-            
-            init() {
-                // 创建整个触摸层的Hammer实例（用于滑动）
-                if (this.reader.touchLayerElement) {
-                    this.mainHammer = new Hammer(this.reader.touchLayerElement);
-                    this.mainHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-                    this.mainHammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
-                    this.mainHammer.on('swiperight', (e) => this.handleSwipeRight(e));
-                }
-                
-                // 初始化左侧区域（点击翻页）
-                if (this.reader.leftTouchArea) {
-                    this.leftHammer = new Hammer(this.reader.leftTouchArea);
-                    this.leftHammer.get('tap').set({ time: 300 });
-                    this.leftHammer.on('tap', (e) => this.handleLeftTap(e));
-                }
-                
-                // 初始化中间区域（点击控制栏）
-                if (this.reader.centerTouchArea) {
-                    this.centerHammer = new Hammer(this.reader.centerTouchArea);
-                    this.centerHammer.get('tap').set({ time: 300 });
-                    this.centerHammer.on('tap', (e) => this.handleCenterTap(e));
-                }
-                
-                // 初始化右侧区域（点击翻页）
-                if (this.reader.rightTouchArea) {
-                    this.rightHammer = new Hammer(this.reader.rightTouchArea);
-                    this.rightHammer.get('tap').set({ time: 300 });
-                    this.rightHammer.on('tap', (e) => this.handleRightTap(e));
-                }
-            }
-            
 
-            
-            // 全局滑动处理方法
+            init() {
+                // 初始化Hammer.js
+                this.mainHammer = new Hammer(this.app.touchLayerElement);
+                this.leftHammer = new Hammer(this.app.leftTouchArea);
+                this.centerHammer = new Hammer(this.app.centerTouchArea);
+                this.rightHammer = new Hammer(this.app.rightTouchArea);
+
+                // 配置手势识别
+                this.mainHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+                this.leftHammer.get('tap').set({ time: 300 });
+                this.centerHammer.get('tap').set({ time: 300 });
+                this.rightHammer.get('tap').set({ time: 300 });
+
+                // 绑定事件
+                this.mainHammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
+                this.mainHammer.on('swiperight', (e) => this.handleSwipeRight(e));
+                this.leftHammer.on('tap', (e) => this.handleLeftTap(e));
+                this.centerHammer.on('tap', (e) => this.handleCenterTap(e));
+                this.rightHammer.on('tap', (e) => this.handleRightTap(e));
+            }
+
             handleSwipeLeft(e) {
                 if (!this.isEnabled) return;
-                
-                console.log('向左滑动 - 下一页', e);
+                this.app.nextPage();
                 this.showPageIndicator('right');
-                this.reader.nextPage();
             }
-            
+
             handleSwipeRight(e) {
                 if (!this.isEnabled) return;
-                
-                console.log('向右滑动 - 上一页', e);
+                this.app.prevPage();
                 this.showPageIndicator('left');
-                this.reader.prevPage();
             }
-            
-            // 左侧区域处理方法
-            
+
             handleLeftTap(e) {
                 if (!this.isEnabled) return;
-                
-                console.log('左侧区域单击 - 上一页', e);
+                this.app.prevPage();
                 this.showPageIndicator('left');
-                this.reader.prevPage();
             }
-            
-            // 中间区域处理方法
+
             handleCenterTap(e) {
                 if (!this.isEnabled) return;
-                
-                console.log('中间区域单击 - 切换控制栏', e);
                 this.toggleControls();
             }
-            
 
-            
             handleRightTap(e) {
                 if (!this.isEnabled) return;
-                
-                console.log('右侧区域单击 - 下一页', e);
+                this.app.nextPage();
                 this.showPageIndicator('right');
-                this.reader.nextPage();
             }
-            
 
-            
-
-            
-            handlePress(e) {
-                if (!this.isEnabled) return;
-                
-                console.log('长按 - 可选功能');
-                // 这里可以添加长按功能，比如文本选择
-            }
-            
-            showPageIndicator(direction) {
-                const indicator = direction === 'left' ? 
-                    this.reader.pageIndicatorLeft : 
-                    this.reader.pageIndicatorRight;
-                
-                if (indicator) {
-                    indicator.classList.add('show');
-                    setTimeout(() => {
-                        indicator.classList.remove('show');
-                    }, 300);
-                }
-            }
-            
             toggleControls() {
-                // 切换控制栏显示状态
                 const header = document.querySelector('.header');
                 const footer = document.querySelector('.footer');
                 
@@ -2023,25 +663,33 @@
                     const isVisible = !header.classList.contains('hidden');
                     
                     if (isVisible) {
-                        // 隐藏工具栏
                         header.classList.add('hidden');
                         footer.classList.add('hidden');
                     } else {
-                        // 显示工具栏
                         header.classList.remove('hidden');
                         footer.classList.remove('hidden');
                     }
                 }
             }
-            
+
+            showPageIndicator(direction) {
+                const indicator = direction === 'left' ? 
+                    this.app.pageIndicatorLeft : this.app.pageIndicatorRight;
+                
+                indicator.classList.add('show');
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 300);
+            }
+
             enable() {
                 this.isEnabled = true;
             }
-            
+
             disable() {
                 this.isEnabled = false;
             }
-            
+
             destroy() {
                 if (this.mainHammer) {
                     this.mainHammer.destroy();
@@ -2062,105 +710,9 @@
             }
         }
 
-                    // 检测网络状态
-            function updateOnlineStatus() {
-                if (!navigator.onLine) {
-                    console.log('应用处于离线状态');
-                    showOfflineIndicator();
-                } else {
-                    console.log('应用已连接到网络');
-                    hideOfflineIndicator();
-                }
-            }
-            
-            // 显示离线指示器
-            function showOfflineIndicator() {
-                let indicator = document.getElementById('offlineIndicator');
-                if (!indicator) {
-                    indicator = document.createElement('div');
-                    indicator.id = 'offlineIndicator';
-                    indicator.style.cssText = `
-                        position: fixed;
-                        top: 10px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        background: #e74c3c;
-                        color: white;
-                        padding: 8px 16px;
-                        border-radius: 20px;
-                        font-size: 12px;
-                        z-index: 10001;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                    `;
-                    indicator.textContent = '📶 离线模式';
-                    document.body.appendChild(indicator);
-                }
-            }
-            
-            // 隐藏离线指示器
-            function hideOfflineIndicator() {
-                const indicator = document.getElementById('offlineIndicator');
-                if (indicator) {
-                    indicator.remove();
-                }
-            }
-        
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
-
-
-        // 初始化阅读器
+        // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
-            new EpubReader();
-            
-            // 注册Service Worker
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then((registration) => {
-                            console.log('SW registered: ', registration);
-                            
-
-                        })
-                        .catch((registrationError) => {
-                            console.log('SW registration failed: ', registrationError);
-                        });
-                });
-            }
-            
-
-
-            // PWA 安装提示
-            let deferredPrompt;
-            const installPrompt = document.getElementById('installPrompt');
-            const installBtn = document.getElementById('installBtn');
-            const closeInstall = document.getElementById('closeInstall');
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installPrompt.style.display = 'flex';
-            });
-
-            installBtn.addEventListener('click', () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            console.log('用户接受了安装提示');
-                        }
-                        deferredPrompt = null;
-                        installPrompt.style.display = 'none';
-                    });
-                }
-            });
-
-            closeInstall.addEventListener('click', () => {
-                installPrompt.style.display = 'none';
-            });
-
-
+            new AppUI();
         });
     </script>
 </body>
