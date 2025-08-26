@@ -76,7 +76,7 @@
             transform: translateY(-100%);
         }
         
-        /* 底部标签栏 - 微信风格 */
+        /* 底部标签栏 - 成熟应用标准 */
         .footer {
             position: fixed;
             bottom: 0;
@@ -89,10 +89,9 @@
             justify-content: space-around;
             align-items: center;
             box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
-            min-height: 49px;
             z-index: 1000;
-            /* 覆盖Home Indicator - 微信风格 */
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            /* 成熟应用标准 - 完全覆盖Home Indicator */
+            padding-bottom: env(safe-area-inset-bottom);
             min-height: calc(49px + env(safe-area-inset-bottom));
         }
         
@@ -143,15 +142,15 @@
             margin-bottom: 2px;
         }
 
-        /* 主内容区域 - 微信风格 */
+        /* 主内容区域 - 成熟应用标准 */
         .main-content {
             position: relative;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            /* 微信风格布局 - Footer覆盖Home Indicator */
+            /* 成熟应用标准 - 内容直接延伸到Footer */
             padding-top: calc(44px + env(safe-area-inset-top));
-            padding-bottom: calc(49px + env(safe-area-inset-bottom));
+            padding-bottom: 0;
         }
 
         /* 欢迎页面 - 微信风格 */
@@ -844,6 +843,33 @@
         // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
             new AppUI();
+            
+            // 强制修复Footer位置 - 成熟应用标准
+            function fixFooterPosition() {
+                const footer = document.querySelector('.footer');
+                const mainContent = document.querySelector('.main-content');
+                
+                if (footer) {
+                    // 确保Footer完全覆盖Home Indicator
+                    footer.style.bottom = '0px';
+                    footer.style.paddingBottom = 'env(safe-area-inset-bottom)';
+                    footer.style.minHeight = 'calc(49px + env(safe-area-inset-bottom))';
+                    footer.style.zIndex = '1000';
+                }
+                
+                if (mainContent) {
+                    // 移除主内容区域的底部padding
+                    mainContent.style.paddingBottom = '0px';
+                }
+                
+                console.log('Footer位置已修复 - 成熟应用标准');
+            }
+            
+            // 立即执行
+            fixFooterPosition();
+            
+            // 监听窗口变化
+            window.addEventListener('resize', fixFooterPosition);
         });
     </script>
 </body>
