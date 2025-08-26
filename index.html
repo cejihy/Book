@@ -18,8 +18,7 @@
     <meta name="theme-color" content="#2c3e50">
     <script src="jszip.min.js"></script>
     <script src="epub.min.js"></script>
-    <!-- 移除Hammer.js -->
-    <!-- <script src="hammer.min.js"></script> -->
+    <script src="hammer.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -97,6 +96,64 @@
             width: 100% !important;
             height: 100% !important;
             border: none !important;
+        }
+        
+        /* 触摸层样式 */
+        .touch-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: auto;
+            background: transparent;
+            touch-action: pan-y; /* 允许垂直滚动 */
+        }
+        
+        /* 翻页提示指示器 */
+        .page-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background: rgba(44, 62, 80, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 20;
+        }
+        
+        .page-indicator.left {
+            left: 20px;
+        }
+        
+        .page-indicator.right {
+            right: 20px;
+        }
+        
+        .page-indicator.show {
+            opacity: 1;
+        }
+        
+        /* 翻页动画 */
+        .page-transition {
+            transition: transform 0.3s ease-out;
+        }
+        
+        .page-transition.slide-left {
+            transform: translateX(-100%);
+        }
+        
+        .page-transition.slide-right {
+            transform: translateX(100%);
         }
         
 
@@ -554,10 +611,12 @@
         <div id="readerContainer" class="reader-container">
             <div class="viewer">
                 <div id="viewer"></div>
-                <!-- 移除翻页提示和调试区域 -->
+                <!-- 触摸层 -->
+                <div id="touchLayer" class="touch-layer"></div>
+                <!-- 翻页指示器 -->
+                <div id="pageIndicatorLeft" class="page-indicator left">‹</div>
+                <div id="pageIndicatorRight" class="page-indicator right">›</div>
             </div>
-            
-
         </div>
     </div>
 
@@ -606,9 +665,7 @@
                 this.books = []; // 书架中的书籍
                 this.currentBookId = null; // 当前阅读的书籍ID
                 this.db = null; // IndexedDB 数据库
-                // 移除点击相关变量
-                // this.lastClickTime = 0; // 防止重复点击
-                // this.clickCooldown = 500; // 点击冷却时间（毫秒）
+                this.touchLayer = null; // 触摸层实例
                 
                 this.initElements();
                 this.bindEvents();
@@ -616,8 +673,6 @@
                     this.loadBookshelf().then(() => {
                         this.updateWelcomePage(); // 更新欢迎页面
                         this.restoreLastReadBook(); // 恢复上次阅读的书籍
-                        
-
                     });
                 });
             }
@@ -653,26 +708,15 @@
                 this.bookshelfClose = document.getElementById('bookshelfClose');
                 this.bookCount = document.getElementById('bookCount');
                 
-                // 移除翻页提示和调试元素引用
-                // this.pageHintLeft = document.getElementById('pageHintLeft');
-                // this.pageHintRight = document.getElementById('pageHintRight');
-                // this.pageIndicatorLeft = document.getElementById('pageIndicatorLeft');
-                // this.pageIndicatorRight = document.getElementById('pageIndicatorRight');
-                // this.debugAreaLeft = document.getElementById('debugAreaLeft');
-                // this.debugAreaRight = document.getElementById('debugAreaRight');
-                // this.debugAreaCenter = document.getElementById('debugAreaCenter');
+                // 触摸层元素
+                this.touchLayerElement = document.getElementById('touchLayer');
+                this.pageIndicatorLeft = document.getElementById('pageIndicatorLeft');
+                this.pageIndicatorRight = document.getElementById('pageIndicatorRight');
                 
                 // 手动更新按钮事件
                 this.manualUpdateBtn.addEventListener('click', () => {
                     this.manualUpdate();
                 });
-
-                // 移除调试按钮事件
-                // this.debugBtn = document.getElementById('debugBtn');
-                // this.debugBtn.addEventListener('click', () => {
-                //     this.toggleDebugMode();
-                // });
-
             }
 
             bindEvents() {
@@ -860,11 +904,9 @@
                 this.hideLoading();
                 this.readerContainer.style.display = 'flex';
                 this.updateNavigation();
-                // 移除阅读提示
-                // this.showReadingTips();
                 
-                // 移除Hammer.js事件设置
-                // this.setupEpubClickEvents();
+                // 初始化触摸层
+                this.initTouchLayer();
             }
 
             async prevPage() {
@@ -876,6 +918,18 @@
             async nextPage() {
                 if (this.rendition) {
                     await this.rendition.next();
+                }
+            }
+            
+            // 初始化触摸层
+            initTouchLayer() {
+                if (this.touchLayer) {
+                    this.touchLayer.destroy();
+                }
+                
+                if (this.touchLayerElement) {
+                    this.touchLayer = new TouchLayer(this.touchLayerElement, this);
+                    console.log('触摸层初始化完成');
                 }
             }
 
@@ -1573,6 +1627,12 @@
             }
 
             cleanupCurrentBook() {
+                // 清理触摸层
+                if (this.touchLayer) {
+                    this.touchLayer.destroy();
+                    this.touchLayer = null;
+                }
+                
                 // 清理渲染器
                 if (this.rendition) {
                     try {
@@ -1600,9 +1660,12 @@
                 this.toc = [];
                 this.currentCfi = null;
 
-                // 清空阅读器容器
+                // 清空阅读器容器（保留触摸层和指示器）
                 if (this.viewer) {
-                    this.viewer.innerHTML = '';
+                    const iframe = this.viewer.querySelector('iframe');
+                    if (iframe) {
+                        iframe.remove();
+                    }
                 }
 
                 // 清空目录列表
@@ -1618,6 +1681,117 @@
                 console.log('书籍实例清理完成');
             }
 
+        }
+
+        // 触摸层类
+        class TouchLayer {
+            constructor(element, reader) {
+                this.element = element;
+                this.reader = reader;
+                this.hammer = null;
+                this.isEnabled = true;
+                
+                this.init();
+            }
+            
+            init() {
+                if (!this.element) return;
+                
+                // 创建Hammer实例
+                this.hammer = new Hammer(this.element);
+                
+                // 配置识别器
+                this.hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+                this.hammer.get('tap').set({ time: 300 });
+
+                this.hammer.get('press').set({ time: 500 });
+                
+
+                
+                // 绑定事件
+                this.bindEvents();
+            }
+            
+            bindEvents() {
+                // 左右滑动翻页
+                this.hammer.on('swipeleft', (e) => this.handleSwipeLeft(e));
+                this.hammer.on('swiperight', (e) => this.handleSwipeRight(e));
+                
+                // 单击显示/隐藏控制栏
+                this.hammer.on('tap', (e) => this.handleTap(e));
+                
+                // 长按（可选功能）
+                this.hammer.on('press', (e) => this.handlePress(e));
+            }
+            
+            handleSwipeLeft(e) {
+                if (!this.isEnabled) return;
+                
+                console.log('向左滑动 - 下一页', e);
+                this.showPageIndicator('right');
+                this.reader.nextPage();
+            }
+            
+            handleSwipeRight(e) {
+                if (!this.isEnabled) return;
+                
+                console.log('向右滑动 - 上一页', e);
+                this.showPageIndicator('left');
+                this.reader.prevPage();
+            }
+            
+            handleTap(e) {
+                if (!this.isEnabled) return;
+                
+                console.log('单击 - 切换控制栏', e);
+                this.toggleControls();
+            }
+            
+
+            
+            handlePress(e) {
+                if (!this.isEnabled) return;
+                
+                console.log('长按 - 可选功能');
+                // 这里可以添加长按功能，比如文本选择
+            }
+            
+            showPageIndicator(direction) {
+                const indicator = direction === 'left' ? 
+                    this.reader.pageIndicatorLeft : 
+                    this.reader.pageIndicatorRight;
+                
+                if (indicator) {
+                    indicator.classList.add('show');
+                    setTimeout(() => {
+                        indicator.classList.remove('show');
+                    }, 300);
+                }
+            }
+            
+            toggleControls() {
+                // 切换控制栏显示状态
+                const header = document.querySelector('.header');
+                if (header) {
+                    const isVisible = header.style.display !== 'none';
+                    header.style.display = isVisible ? 'none' : 'flex';
+                }
+            }
+            
+            enable() {
+                this.isEnabled = true;
+            }
+            
+            disable() {
+                this.isEnabled = false;
+            }
+            
+            destroy() {
+                if (this.hammer) {
+                    this.hammer.destroy();
+                    this.hammer = null;
+                }
+            }
         }
 
                     // 检测网络状态
